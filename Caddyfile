@@ -1,0 +1,14 @@
+inoxlink.com.br {
+    reverse_proxy localhost:1415
+    
+    header {
+        # Enable HSTS
+        Strict-Transport-Security "max-age=31536000;"
+        # Prevent clickjacking
+        X-Frame-Options DENY
+        # Prevent sniffing
+        X-Content-Type-Options nosniff
+    }
+
+    encode zstd gzip
+}
