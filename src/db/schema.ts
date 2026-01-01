@@ -1,5 +1,4 @@
 import { pgTable, index, serial, varchar, timestamp, text, foreignKey, jsonb, boolean, integer, uuid } from "drizzle-orm/pg-core"
-import { sql } from "drizzle-orm"
 
 export const categories = pgTable("categories", {
     id: serial().primaryKey().notNull(),

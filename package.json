@@ -19,5 +19,8 @@
   "devDependencies": {
     "dotenv": "^17.2.3",
     "drizzle-kit": "^0.31.8"
+  },
+  "engines": {
+    "node": "22.x"
   }
 }
