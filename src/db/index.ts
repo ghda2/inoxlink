@@ -6,10 +6,13 @@ import * as relations from './relations';
 const databaseUrl = import.meta.env?.DATABASE_URL || process.env?.DATABASE_URL;
 
 if (!databaseUrl) {
+    if (import.meta.env.PROD) {
+        throw new Error('❌ DATABASE_URL missing in production environment variables!');
+    }
     console.warn('⚠️ DATABASE_URL não encontrada! Verifique o arquivo .env');
 }
 
-const sql = neon(databaseUrl!);
+const sql = neon(databaseUrl || '');
 export const db = drizzle(sql, {
     schema: { ...schema, ...relations }
 });
