@@ -1,0 +1,93 @@
+---
+import '../styles/global.css';
+
+interface Props {
+	title: string;
+	description?: string;
+}
+
+const { title, description = "Inox Link - Seu portal de notícias e wiki sobre aço inox." } = Astro.props;
+---
+
+<!doctype html>
+<html lang="pt-br">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title} | Inox Link</title>
+		<meta name="description" content={description} />
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+	</head>
+	<body class="bg-[#f8f9fa] text-[#1a1a1a] min-h-screen font-['Inter',sans-serif] selection:bg-black selection:text-white">
+		<div class="fixed inset-0 -z-10 bg-[radial-gradient(45%_45%_at_50%_50%,#e5e7eb_0%,#f8f9fa_100%)]"></div>
+		
+		<nav class="sticky top-0 z-50 w-full border-b border-white/20 bg-white/60 backdrop-blur-xl">
+			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+				<div class="flex justify-between h-16 items-center">
+					<div class="flex items-center">
+						<a href="/" class="text-2xl font-black tracking-tighter text-black flex items-center gap-2">
+							<div class="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
+								<div class="w-4 h-4 border-2 border-white rounded-sm rotate-45"></div>
+							</div>
+							<span>INOX<span class="text-neutral-500">LINK</span></span>
+						</a>
+					</div>
+					<div class="hidden md:block">
+						<div class="ml-10 flex items-baseline space-x-8">
+							<a href="/" class="text-sm font-medium hover:text-neutral-500 transition-colors">Início</a>
+							<a href="/noticias" class="text-sm font-medium hover:text-neutral-500 transition-colors">Notícias</a>
+							<a href="/wiki" class="text-sm font-medium hover:text-neutral-500 transition-colors">Wiki</a>
+						</div>
+					</div>
+					<div class="flex items-center gap-4">
+						<button class="px-4 py-2 bg-black text-white text-xs font-bold rounded-full transform active:scale-95 transition-all hover:bg-neutral-800">
+							NOTIFICAR-ME
+						</button>
+					</div>
+				</div>
+			</div>
+		</nav>
+
+		<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+			<slot />
+		</main>
+
+		<footer class="mt-20 border-t border-neutral-200 bg-white/40 py-12 backdrop-blur-sm">
+			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+				<p class="text-sm text-neutral-500 font-medium">© 2024 Inox Link. Todos os direitos reservados.</p>
+			</div>
+		</footer>
+	</body>
+</html>
+
+<style is:global>
+	:root {
+		--glass-bg: rgba(255, 255, 255, 0.6);
+		--glass-border: rgba(255, 255, 255, 0.2);
+	}
+
+	.glass {
+		background: var(--glass-bg);
+		backdrop-filter: blur(12px);
+		border: 1px solid var(--glass-border);
+		box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+	}
+
+	::-webkit-scrollbar {
+		width: 10px;
+	}
+	::-webkit-scrollbar-track {
+		background: #f1f1f1;
+	}
+	::-webkit-scrollbar-thumb {
+		background: #d1d1d1;
+		border-radius: 5px;
+	}
+	::-webkit-scrollbar-thumb:hover {
+		background: #a1a1a1;
+	}
+</style>

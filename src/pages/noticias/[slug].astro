@@ -1,0 +1,93 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { db } from '../../db';
+import { news } from '../../db/schema';
+import { eq } from 'drizzle-orm';
+
+const { slug } = Astro.params;
+
+if (!slug) {
+    return Astro.redirect('/404');
+}
+
+const [item] = await db.select().from(news).where(eq(news.slug, slug)).limit(1);
+
+if (!item) {
+    return Astro.redirect('/404');
+}
+
+export const prerender = false;
+---
+
+<Layout title={item.title} description={item.excerpt || undefined}>
+    <article class="max-w-4xl mx-auto space-y-12">
+        <!-- Header -->
+        <header class="space-y-8 text-center pt-8">
+            <div class="flex items-center justify-center gap-2 text-xs font-black text-neutral-400 uppercase tracking-[0.2em]">
+                <a href="/noticias" class="hover:text-black transition-colors">Notícias</a>
+                <span class="w-1 h-1 bg-neutral-300 rounded-full"></span>
+                <span>{new Date(item.createdAt || '').toLocaleDateString('pt-BR')}</span>
+            </div>
+            
+            <h1 class="text-4xl md:text-6xl font-black tracking-tighter leading-tight italic uppercase">
+                {item.title}
+            </h1>
+            
+            {item.excerpt && (
+                <p class="text-xl text-neutral-500 font-medium max-w-2xl mx-auto leading-relaxed">
+                    {item.excerpt}
+                </p>
+            )}
+
+            <div class="flex items-center justify-center gap-4 pt-4">
+                <div class="w-10 h-10 bg-neutral-100 rounded-full flex items-center justify-center border border-neutral-200">
+                    <span class="text-xs font-bold">IL</span>
+                </div>
+                <div class="text-left">
+                    <p class="text-sm font-bold">Redação Inox Link</p>
+                    <p class="text-[10px] text-neutral-400 font-bold uppercase tracking-widest">Equipe Editorial</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Featured Image -->
+        {item.imageUrl && (
+            <div class="relative aspect-[21/9] overflow-hidden rounded-[2.5rem] bg-neutral-100 border border-neutral-200">
+                <img 
+                    src={item.imageUrl} 
+                    alt={item.title} 
+                    class="h-full w-full object-cover"
+                />
+            </div>
+        )}
+
+        <!-- Content -->
+        <div class="prose prose-neutral prose-lg max-w-none 
+            prose-headings:font-black prose-headings:tracking-tighter prose-headings:italic prose-headings:uppercase
+            prose-p:text-neutral-600 prose-p:leading-relaxed prose-p:font-medium
+            prose-a:text-black prose-a:font-bold prose-a:no-underline hover:prose-a:underline
+            prose-strong:text-black prose-strong:font-bold
+            prose-img:rounded-3xl prose-img:border prose-img:border-neutral-200
+            mx-auto">
+            <Fragment set:html={item.content} />
+        </div>
+
+        <!-- Share & Tags -->
+        <footer class="pt-12 border-t border-neutral-200">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                <div class="flex flex-wrap gap-2">
+                    <span class="px-4 py-2 bg-neutral-100 rounded-full text-xs font-bold text-neutral-500 italic">#INOX</span>
+                    <span class="px-4 py-2 bg-neutral-100 rounded-full text-xs font-bold text-neutral-500 italic">#NOTICIAS</span>
+                </div>
+                <div class="flex gap-4">
+                    <button class="p-3 bg-neutral-100 hover:bg-neutral-200 rounded-full transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 100-3.316 3 3 0 000 3.316m0 6.632a3 3 0 100 3.316 3 3 0 000-3.316"></path></svg>
+                    </button>
+                    <button class="p-3 bg-neutral-100 hover:bg-neutral-200 rounded-full transition-colors">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </footer>
+    </article>
+</Layout>
