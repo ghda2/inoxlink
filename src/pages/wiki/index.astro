@@ -1,0 +1,44 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { db } from '../../db';
+import { wiki } from '../../db/schema';
+import { desc } from 'drizzle-orm';
+
+const allWiki = await db.select().from(wiki).orderBy(desc(wiki.createdAt));
+
+export const prerender = false;
+---
+
+<Layout title="Wiki" description="Conhecimento técnico e enciclopédia sobre aço inoxidável.">
+    <div class="space-y-12">
+        <header class="space-y-4">
+            <h1 class="text-5xl font-black tracking-tighter italic uppercase">Inox Wiki</h1>
+            <p class="text-neutral-500 text-lg font-medium max-w-2xl">
+                Sua fonte definitiva de informação técnica sobre ligas, acabamentos e aplicações do aço inox.
+            </p>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {allWiki.map((item) => (
+                <a href={`/wiki/${item.slug}`} class="glass group rounded-3xl p-8 transition-all hover:bg-white/80">
+                    <div class="space-y-4">
+                        <div class="w-10 h-10 bg-black rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <span class="text-white font-black text-sm">W</span>
+                        </div>
+                        <div class="space-y-2">
+                            <h2 class="text-2xl font-black tracking-tighter italic uppercase group-hover:text-neutral-700 transition-colors">
+                                {item.title}
+                            </h2>
+                            <p class="text-neutral-500 font-medium line-clamp-2">
+                                {item.content.replace(/<[^>]*>/g, '')}
+                            </p>
+                        </div>
+                        <div class="pt-2">
+                            <span class="text-xs font-bold text-black border-b-2 border-black">LER ARTIGO</span>
+                        </div>
+                    </div>
+                </a>
+            ))}
+        </div>
+    </div>
+</Layout>

@@ -6,8 +6,6 @@
     Tema: Noticias / Wiki
     Cores Principais: Preto e escalar de cinza, com o fundo em branco e preto para os textos
 
-## SPRINT 1: Setup Inicial (3min)
-
 ## SPRINT 1: Setup Inicial (Concluído ✅)
 
 ```bash

@@ -1,0 +1,67 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { db } from '../../db';
+import { wiki, authors } from '../../db/schema';
+import { eq } from 'drizzle-orm';
+
+const { slug } = Astro.params;
+
+if (!slug) {
+    return Astro.redirect('/404');
+}
+
+const [item] = await db.select().from(wiki).where(eq(wiki.slug, slug)).limit(1);
+
+if (!item) {
+    return Astro.redirect('/404');
+}
+
+export const prerender = false;
+---
+
+<Layout title={item.title}>
+    <article class="max-w-4xl mx-auto space-y-12">
+        <!-- Header -->
+        <header class="space-y-8 pt-8">
+            <div class="flex items-center gap-2 text-xs font-black text-neutral-400 uppercase tracking-[0.2em]">
+                <a href="/wiki" class="hover:text-black transition-colors text-black border-b border-black">Wiki</a>
+                <span class="w-1 h-1 bg-neutral-300 rounded-full"></span>
+                <span>Artigo Técnico</span>
+            </div>
+            
+            <h1 class="text-4xl md:text-6xl font-black tracking-tighter leading-tight italic uppercase">
+                {item.title}
+            </h1>
+        </header>
+
+        <!-- Content Box -->
+        <div class="glass rounded-[2rem] p-8 md:p-12 border-black/5">
+            <div class="prose prose-neutral prose-lg max-w-none 
+                prose-headings:font-black prose-headings:tracking-tighter prose-headings:italic prose-headings:uppercase
+                prose-p:text-neutral-600 prose-p:leading-relaxed prose-p:font-medium
+                prose-a:text-black prose-a:font-bold prose-a:no-underline hover:prose-a:underline
+                prose-strong:text-black prose-strong:font-bold
+                prose-img:rounded-3xl prose-img:border prose-img:border-neutral-200">
+                <Fragment set:html={item.content} />
+            </div>
+        </div>
+
+        <!-- Sidebar Info -->
+        <footer class="pt-12 border-t border-neutral-200">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-black rounded-xl flex items-center justify-center">
+                        <span class="text-white font-black text-lg">W</span>
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold uppercase italic tracking-tighter">Inox Wiki Knowledge</p>
+                        <p class="text-[10px] text-neutral-400 font-bold uppercase">Última atualização: {new Date(item.updatedAt || item.createdAt || '').toLocaleDateString('pt-BR')}</p>
+                    </div>
+                </div>
+                <div class="flex gap-4">
+                    <button class="px-6 py-2 bg-neutral-100 hover:bg-neutral-200 rounded-full text-xs font-black transition-colors uppercase italic"> Compartilhar </button>
+                </div>
+            </div>
+        </footer>
+    </article>
+</Layout>
