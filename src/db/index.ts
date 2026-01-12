@@ -7,7 +7,7 @@ const databaseUrl = process.env?.DATABASE_URL || import.meta.env?.DATABASE_URL;
 
 if (!databaseUrl) {
     console.error('❌ ERRO CRÍTICO: DATABASE_URL não encontrada no ambiente!');
-    if (import.meta.env.PROD) {
+    if (typeof import.meta !== 'undefined' && import.meta.env?.PROD) {
         // Em produção, vamos apenas logar e deixar o erro estourar ao tentar conectar
         console.error('Certifique-se de que a variável DATABASE_URL está definida no PM2 ou no arquivo .env');
     }

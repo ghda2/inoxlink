@@ -1,10 +1,35 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { db } from '../../db';
-import { news } from '../../db/schema';
-import { desc } from 'drizzle-orm';
+import { news, categories, authors } from '../../db/schema';
+import { desc, eq } from 'drizzle-orm';
 
-const allNews = await db.select().from(news).orderBy(desc(news.createdAt));
+// Get all published news with category and author info
+const allNews = await db.select({
+    id: news.id,
+    title: news.title,
+    slug: news.slug,
+    excerpt: news.excerpt,
+    imageUrl: news.imageUrl,
+    imageAlt: news.imageAlt,
+    createdAt: news.createdAt,
+    published: news.published,
+    featuredLevel: news.featuredLevel,
+    readingTime: news.readingTime,
+    tags: news.tags,
+    categoryId: news.categoryId,
+    categoryName: categories.name,
+    categorySlug: categories.slug,
+    authorId: news.authorId,
+    authorName: authors.name,
+    authorSlug: authors.slug,
+    authorAvatar: authors.avatarUrl,
+})
+.from(news)
+.leftJoin(categories, eq(news.categoryId, categories.id))
+.leftJoin(authors, eq(news.authorId, authors.id))
+.where(eq(news.published, true))
+.orderBy(desc(news.featuredLevel), desc(news.createdAt));
 
 export const prerender = false;
 ---
@@ -22,18 +47,43 @@ export const prerender = false;
             {allNews.map((item) => (
                 <a href={`/noticias/${item.slug}`} class="group space-y-4">
                     <div class="relative aspect-video overflow-hidden rounded-2xl bg-neutral-100 border border-neutral-200">
-                        {item.imageUrl && (
-                            <img 
-                                src={item.imageUrl} 
-                                alt={item.title} 
+                        {item.imageUrl ? (
+                            <img
+                                src={item.imageUrl}
+                                alt={item.imageAlt || item.title}
                                 class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                             />
+                        ) : (
+                            <div class="h-full w-full flex items-center justify-center">
+                                <svg class="w-16 h-16 text-neutral-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                            </div>
                         )}
                         <div class="absolute inset-0 bg-black/5 group-hover:bg-black/0 transition-colors"></div>
+
+                        {/* Featured badge */}
+                        {item.featuredLevel && item.featuredLevel > 0 && (
+                            <div class="absolute top-3 right-3 px-3 py-1 bg-black text-white rounded-full text-[10px] font-black uppercase tracking-widest">
+                                Destaque
+                            </div>
+                        )}
                     </div>
-                    <div class="space-y-2">
-                        <div class="flex items-center gap-2 text-[10px] font-black text-neutral-400 uppercase tracking-widest">
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-2 text-[10px] font-black text-neutral-400 uppercase tracking-widest flex-wrap">
+                            {item.categoryName && (
+                                <>
+                                    <span class="text-black">{item.categoryName}</span>
+                                    <span class="w-1 h-1 bg-neutral-300 rounded-full"></span>
+                                </>
+                            )}
                             <span>{new Date(item.createdAt || '').toLocaleDateString('pt-BR')}</span>
+                            {item.readingTime && (
+                                <>
+                                    <span class="w-1 h-1 bg-neutral-300 rounded-full"></span>
+                                    <span>{item.readingTime} min de leitura</span>
+                                </>
+                            )}
                         </div>
                         <h2 class="text-xl font-bold leading-tight group-hover:text-neutral-600 transition-colors uppercase">
                             {item.title}
@@ -41,9 +91,44 @@ export const prerender = false;
                         <p class="text-sm text-neutral-500 line-clamp-2 font-medium">
                             {item.excerpt}
                         </p>
+
+                        {/* Author */}
+                        {item.authorName && (
+                            <div class="flex items-center gap-2 pt-2">
+                                {item.authorAvatar ? (
+                                    <img
+                                        src={item.authorAvatar}
+                                        alt={item.authorName}
+                                        class="w-6 h-6 rounded-full object-cover border border-neutral-200"
+                                    />
+                                ) : (
+                                    <div class="w-6 h-6 bg-neutral-100 rounded-full flex items-center justify-center border border-neutral-200">
+                                        <span class="text-[8px] font-bold">{item.authorName.substring(0, 2).toUpperCase()}</span>
+                                    </div>
+                                )}
+                                <span class="text-xs font-bold text-neutral-500">{item.authorName}</span>
+                            </div>
+                        )}
+
+                        {/* Tags */}
+                        {item.tags && Array.isArray(item.tags) && item.tags.length > 0 && (
+                            <div class="flex flex-wrap gap-1.5 pt-1">
+                                {(item.tags as string[]).slice(0, 3).map((tag) => (
+                                    <span class="px-2 py-0.5 bg-neutral-100 rounded-full text-[10px] font-bold text-neutral-500">
+                                        #{tag}
+                                    </span>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </a>
             ))}
         </div>
+
+        {allNews.length === 0 && (
+            <div class="text-center py-20">
+                <p class="text-neutral-400 text-lg font-medium">Nenhuma notícia publicada ainda.</p>
+            </div>
+        )}
     </div>
 </Layout>

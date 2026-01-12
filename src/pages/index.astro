@@ -2,38 +2,65 @@
 import Layout from '../layouts/Layout.astro';
 import { db } from '../db';
 import { news } from '../db/schema';
-import { desc } from 'drizzle-orm';
+import { desc, eq } from 'drizzle-orm';
 
-const allNews = await db.select().from(news).orderBy(desc(news.createdAt)).limit(10);
+// Get featured news (highest featured level or most recent)
+const [featuredNews] = await db.select().from(news)
+	.where(eq(news.published, true))
+	.orderBy(desc(news.featuredLevel), desc(news.createdAt))
+	.limit(1);
+
+// Get other news
+const allNews = await db.select().from(news)
+	.where(eq(news.published, true))
+	.orderBy(desc(news.createdAt))
+	.limit(9);
 
 export const prerender = false;
 ---
 
 <Layout title="Início">
 	<section class="space-y-12">
-		<!-- Hero Section -->
-		<div class="relative overflow-hidden rounded-[2rem] bg-black p-8 md:p-16 text-white min-h-[500px] flex flex-col justify-end group">
-			<div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent z-10"></div>
-			<!-- Background Pattern -->
-			<div class="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_50%_50%,#333_0%,transparent_100%)]"></div>
-			
-			<div class="relative z-20 space-y-4 max-w-3xl transform transition-transform duration-700 group-hover:translate-y-[-10px]">
-				<span class="inline-block px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-[10px] font-bold tracking-widest uppercase border border-white/20">
-					Destaque da Semana
-				</span>
-				<h1 class="text-4xl md:text-6xl font-black tracking-tight leading-tight italic">
-					O FUTURO DO AÇO INOXIDÁVEL NA ARQUITETURA MODERNA
-				</h1>
-				<p class="text-neutral-400 text-lg md:text-xl font-light">
-					Descubra como novas ligas e processos de fabricação estão revolucionando as cidades do amanhã.
-				</p>
-				<div class="pt-4">
-					<a href="/wiki/futuro-aco-inox" class="inline-flex h-12 items-center justify-center rounded-full bg-white px-8 text-sm font-bold text-black transition-all hover:bg-neutral-200">
-						Ler Artigo Completo
-					</a>
+		<!-- Hero Section - Featured News -->
+		{featuredNews && (
+			<a href={`/noticias/${featuredNews.slug}`} class="block relative overflow-hidden rounded-[2rem] bg-black p-8 md:p-16 text-white min-h-[500px] flex flex-col justify-end group">
+				{/* Background Image */}
+				{featuredNews.imageUrl && (
+					<div class="absolute inset-0">
+						<img
+							src={featuredNews.imageUrl}
+							alt={featuredNews.imageAlt || featuredNews.title}
+							class="w-full h-full object-cover opacity-40 group-hover:opacity-50 transition-opacity duration-700"
+						/>
+					</div>
+				)}
+				<div class="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent z-10"></div>
+
+				<div class="relative z-20 space-y-4 max-w-3xl transform transition-transform duration-700 group-hover:translate-y-[-10px]">
+					<span class="inline-block px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-[10px] font-bold tracking-widest uppercase border border-white/20">
+						{featuredNews.featuredLevel && featuredNews.featuredLevel > 0 ? 'Destaque' : 'Última Notícia'}
+					</span>
+					<h1 class="text-4xl md:text-6xl font-black tracking-tight leading-tight italic uppercase">
+						{featuredNews.title}
+					</h1>
+					{featuredNews.excerpt && (
+						<p class="text-neutral-300 text-lg md:text-xl font-medium">
+							{featuredNews.excerpt}
+						</p>
+					)}
+					<div class="pt-4 flex items-center gap-4">
+						<span class="inline-flex h-12 items-center justify-center rounded-full bg-white px-8 text-sm font-bold text-black transition-all group-hover:bg-neutral-200">
+							Ler Artigo Completo
+						</span>
+						{featuredNews.readingTime && (
+							<span class="text-sm text-neutral-400 font-bold">
+								{featuredNews.readingTime} min de leitura
+							</span>
+						)}
+					</div>
 				</div>
-			</div>
-		</div>
+			</a>
+		)}
 
 		<!-- News Feed -->
 		<div class="space-y-8">

@@ -1,0 +1,43 @@
+---
+interface Props {
+	title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!doctype html>
+<html lang="pt-br">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title} | Admin Inox Link</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+		<script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
+	</head>
+	<body class="bg-neutral-50 text-[#1a1a1a] h-screen w-screen font-['Inter',sans-serif] m-0 p-0 overflow-hidden">
+		<slot />
+	</body>
+</html>
+
+<style is:global>
+	@import "tailwindcss";
+
+	::-webkit-scrollbar {
+		width: 6px;
+	}
+	::-webkit-scrollbar-track {
+		background: transparent;
+	}
+	::-webkit-scrollbar-thumb {
+		background: #d1d1d1;
+		border-radius: 10px;
+	}
+	::-webkit-scrollbar-thumb:hover {
+		background: #000;
+	}
+</style>

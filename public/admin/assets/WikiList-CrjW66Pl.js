@@ -1,0 +1,1 @@
+import{_ as t}from"./_plugin-vue_export-helper-DlAUqK2U.js";import{a as r,b as a,o}from"./index-D2uM6S70.js";const s={};function c(i,e){return o(),r("div",null,[...e[0]||(e[0]=[a("h3",{class:"text-3xl font-black tracking-tighter uppercase italic text-neutral-300"},"Wiki (Em breve)",-1)])])}const f=t(s,[["render",c]]);export{f as default};

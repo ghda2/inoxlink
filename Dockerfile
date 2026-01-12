@@ -1,19 +1,19 @@
-# Use Node.js 22 Alpine as the base image
-FROM node:22-alpine AS base
+# Use Bun Alpine as the base image
+FROM oven/bun:alpine AS base
 WORKDIR /app
 
 # Stage 1: Install dependencies
-COPY package.json package-lock.json* ./
-RUN npm ci
+COPY package.json bun.lockb* ./
+RUN bun install --frozen-lockfile
 
 # Stage 2: Build the application
 FROM base AS build
 COPY . .
 # Build the project
-RUN npm run build
+RUN bun run build
 
 # Stage 3: Production runner
-FROM node:22-alpine AS runner
+FROM oven/bun:alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
@@ -27,4 +27,4 @@ COPY --from=build /app/package.json ./package.json
 
 EXPOSE 4321
 
-CMD ["node", "./dist/server/entry.mjs"]
+CMD ["bun", "./dist/server/entry.mjs"]

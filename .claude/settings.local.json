@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "Bash(bun add:*)",
+      "Bash(bun run dev)",
+      "Bash(timeout /t 10 /nobreak)",
+      "Bash(test:*)"
+    ]
+  }
+}

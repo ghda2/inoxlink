@@ -1,8 +1,8 @@
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 import { db } from '../db';
 import { news, categories, authors, wiki } from '../db/schema';
-import * as dotenv from 'dotenv';
-
-dotenv.config();
 
 async function seed() {
     console.log('🌱 Começando o seeding...');
