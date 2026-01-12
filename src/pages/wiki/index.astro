@@ -9,33 +9,57 @@ const allWiki = await db.select().from(wiki).orderBy(desc(wiki.createdAt));
 export const prerender = false;
 ---
 
-<Layout title="Wiki" description="Conhecimento técnico e enciclopédia sobre aço inoxidável.">
-    <div class="space-y-12">
-        <header class="space-y-4">
-            <h1 class="text-5xl font-black tracking-tighter italic uppercase">Inox Wiki</h1>
-            <p class="text-neutral-500 text-lg font-medium max-w-2xl">
-                Sua fonte definitiva de informação técnica sobre ligas, acabamentos e aplicações do aço inox.
-            </p>
+<Layout title="Inox Wiki" description="Sua fonte definitiva de conhecimento técnico sobre aço inoxidável.">
+    <div class="space-y-16">
+        <!-- Header -->
+        <header class="space-y-8 max-w-4xl">
+            <div class="space-y-4">
+                <div class="inline-flex items-center gap-2 px-3 py-1 bg-black text-white rounded-full text-[10px] font-black uppercase tracking-[0.2em]">
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                    </span>
+                    Base de Conhecimento
+                </div>
+                <h1 class="text-5xl md:text-7xl font-black tracking-tighter italic uppercase leading-[0.9]">Inox Wiki</h1>
+                <p class="text-neutral-500 text-lg md:text-xl font-medium leading-relaxed">
+                    Explore normas técnicas, processos de fabricação e especificações de ligas metálicas com a curadoria dos nossos especialistas.
+                </p>
+            </div>
+
+            <!-- Search Bar UI (Visual) -->
+            <div class="relative max-w-2xl">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <svg class="h-5 w-5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+                <input 
+                    type="text" 
+                    placeholder="Pesquisar ligas, acabamentos ou processos..." 
+                    class="block w-full pl-12 pr-4 py-4 bg-white border border-neutral-200 rounded-2xl text-sm font-medium focus:ring-2 focus:ring-black focus:border-transparent transition-all shadow-sm"
+                />
+            </div>
         </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {allWiki.map((item) => (
-                <a href={`/wiki/${item.slug}`} class="glass group rounded-3xl p-8 transition-all hover:bg-white/80">
-                    <div class="space-y-4">
-                        <div class="w-10 h-10 bg-black rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-                            <span class="text-white font-black text-sm">W</span>
+                <a href={`/wiki/${item.slug}`} class="group relative flex flex-col justify-between p-8 bg-white border border-neutral-100 rounded-[2rem] hover:shadow-2xl hover:shadow-black/5 transition-all duration-500 hover:-translate-y-2">
+                    <div class="space-y-6">
+                        <div class="w-12 h-12 bg-neutral-50 rounded-2xl flex items-center justify-center group-hover:bg-black group-hover:rotate-12 transition-all duration-500 border border-neutral-100">
+                            <span class="text-black font-black text-xl group-hover:text-white transition-colors">W</span>
                         </div>
-                        <div class="space-y-2">
-                            <h2 class="text-2xl font-black tracking-tighter italic uppercase group-hover:text-neutral-700 transition-colors">
+                        <div class="space-y-3">
+                            <h2 class="text-2xl font-black tracking-tighter italic uppercase leading-tight">
                                 {item.title}
                             </h2>
-                            <p class="text-neutral-500 font-medium line-clamp-2">
+                            <p class="text-neutral-500 font-medium text-sm leading-relaxed line-clamp-3">
                                 {item.content.replace(/<[^>]*>/g, '')}
                             </p>
                         </div>
-                        <div class="pt-2">
-                            <span class="text-xs font-bold text-black border-b-2 border-black">LER ARTIGO</span>
-                        </div>
+                    </div>
+                    <div class="pt-8 flex items-center justify-between">
+                        <span class="text-[10px] font-black text-black uppercase tracking-widest border-b-2 border-black/10 group-hover:border-black transition-colors">Ver Completo</span>
+                        <svg class="w-5 h-5 transform -translate-x-2 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
                     </div>
                 </a>
             ))}
