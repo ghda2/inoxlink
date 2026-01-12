@@ -2,8 +2,6 @@
 # Automatic HTTPS with Let's Encrypt
 
 inoxlink.com.br, www.inoxlink.com.br {
-    # Enable HTTP/3
-    protocols h1 h2 h3
 
     # Redirect www to non-www
     @www host www.inoxlink.com.br
