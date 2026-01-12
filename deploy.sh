@@ -13,11 +13,16 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-# Check if .env.production exists
+# Check if .env.production exists or create it from .env
 if [ ! -f .env.production ]; then
-    echo -e "${RED}❌ Error: .env.production file not found${NC}"
-    echo "Please create .env.production from .env.production.example"
-    exit 1
+    if [ -f .env ]; then
+        echo -e "${YELLOW}⚠️  .env.production not found, copying from .env...${NC}"
+        cp .env .env.production
+    else
+        echo -e "${RED}❌ Error: No .env or .env.production file found${NC}"
+        echo "Please create a .env file first"
+        exit 1
+    fi
 fi
 
 # Check if Docker is running
