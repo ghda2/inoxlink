@@ -13,16 +13,11 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-# Check if .env.production exists or create it from .env
-if [ ! -f .env.production ]; then
-    if [ -f .env ]; then
-        echo -e "${YELLOW}⚠️  .env.production not found, copying from .env...${NC}"
-        cp .env .env.production
-    else
-        echo -e "${RED}❌ Error: No .env or .env.production file found${NC}"
-        echo "Please create a .env file first"
-        exit 1
-    fi
+# Check if .env exists
+if [ ! -f .env ]; then
+    echo -e "${RED}❌ Error: No .env file found${NC}"
+    echo "Please create a .env file first"
+    exit 1
 fi
 
 # Check if Docker is running
@@ -34,21 +29,21 @@ fi
 
 # Pull latest changes (if using git)
 if [ -d .git ]; then
-    echo -e "${YELLOW}📥 Pulling latest changes...${NC}"
-    git pull
+    echo -e "${YELLOW}📥 Pulling latest changes from git...${NC}"
+    git pull origin main
 fi
 
 # Stop and remove old containers
 echo -e "${YELLOW}🛑 Stopping old containers...${NC}"
-docker compose -f docker-compose.prod.yml down
+docker compose down
 
 # Build the application
 echo -e "${YELLOW}🏗️  Building application...${NC}"
-docker compose -f docker-compose.prod.yml build --no-cache
+docker compose build --no-cache
 
 # Start containers
 echo -e "${YELLOW}🚀 Starting containers...${NC}"
-docker compose -f docker-compose.prod.yml up -d
+docker compose up -d
 
 # Wait for health check
 echo -e "${YELLOW}⏳ Waiting for health check...${NC}"
@@ -61,13 +56,13 @@ if docker ps | grep -q inoxlink-app && docker ps | grep -q inoxlink-caddy; then
 
     # Show container status
     echo -e "\n${YELLOW}📊 Container Status:${NC}"
-    docker compose -f docker-compose.prod.yml ps
+    docker compose ps
 
     # Show logs command
     echo -e "\n${YELLOW}📝 To view logs:${NC}"
-    echo "docker compose -f docker-compose.prod.yml logs -f"
+    echo "docker compose logs -f"
 else
     echo -e "${RED}❌ Deployment failed!${NC}"
-    echo "Check logs with: docker compose -f docker-compose.prod.yml logs"
+    echo "Check logs with: docker compose logs"
     exit 1
 fi
