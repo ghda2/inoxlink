@@ -5,7 +5,6 @@ import tailwindcss from '@tailwindcss/vite';
 import node from '@astrojs/node';
 
 import react from '@astrojs/react';
-import keystatic from '@keystatic/astro';
 
 // https://astro.build/config
 export default defineConfig({
@@ -20,5 +19,7 @@ export default defineConfig({
     mode: 'standalone',
   }),
 
-  integrations: [react(), keystatic()]
+  session: {},
+
+  integrations: [react()]
 });

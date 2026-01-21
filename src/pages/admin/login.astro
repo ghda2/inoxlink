@@ -1,0 +1,89 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import '../../styles/global.css';
+
+// Se já estiver logado, vai direto para o admin
+const user = await Astro.session?.get('user');
+if (user) {
+    return Astro.redirect('/admin');
+}
+
+let error = '';
+
+if (Astro.request.method === 'POST') {
+    try {
+        const data = await Astro.request.formData();
+        const password = data.get('password');
+        
+        if (password === 'admin123') {
+            await Astro.session.set('user', { role: 'admin' });
+            return Astro.redirect('/admin');
+        } else {
+            error = 'Acesso Negado';
+        }
+    } catch (e) {
+        error = 'Erro de Sistema';
+    }
+}
+---
+
+<div class="min-h-screen bg-[#050505] flex items-center justify-center p-6 selection:bg-white selection:text-black">
+    <!-- Background Efeitos -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-white/[0.03] rounded-full blur-[120px]"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-white/[0.02] rounded-full blur-[120px]"></div>
+    </div>
+
+    <div class="w-full max-w-[440px] relative">
+        <!-- Logo Topo -->
+        <div class="flex flex-col items-center mb-12 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+            <div class="group relative">
+                <div class="absolute inset-0 bg-white blur-2xl opacity-10 group-hover:opacity-20 transition-opacity duration-500"></div>
+                <div class="relative w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-[0_0_40px_rgba(255,255,255,0.1)] transform -rotate-6 transition-transform group-hover:rotate-0 duration-500">
+                    <span class="font-black text-2xl text-black tracking-tighter italic">IL</span>
+                </div>
+            </div>
+            <h1 class="text-3xl font-black text-white italic tracking-[0.2em] uppercase mt-8 text-center leading-none">
+                Inox Link
+            </h1>
+            <div class="h-[1px] w-12 bg-white/20 mt-4"></div>
+        </div>
+
+        <!-- Login Card -->
+        <div class="bg-zinc-900/30 backdrop-blur-3xl border border-white/5 rounded-[2.5rem] p-10 lg:p-12 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] animate-in fade-in zoom-in-95 duration-700 delay-200">
+            <form method="POST" class="space-y-10">
+                <div class="space-y-4">
+                    <div class="flex justify-between items-end px-1">
+                        <label class="text-[10px] font-black text-zinc-500 uppercase tracking-[0.3em]">Senha Mestra</label>
+                        {error && <span class="text-[10px] font-bold text-red-500 uppercase tracking-widest animate-bounce">{error}</span>}
+                    </div>
+                    <div class="relative group">
+                        <input 
+                            type="password" 
+                            name="password" 
+                            required 
+                            autofocus
+                            placeholder="DIREITO DE ACESSO"
+                            class="w-full bg-black/40 border-b-2 border-white/5 rounded-2xl px-6 py-6 text-white outline-none focus:border-white transition-all font-mono text-center tracking-[0.5em] placeholder:text-zinc-800 placeholder:text-[10px] placeholder:font-black placeholder:tracking-[0.2em]"
+                        />
+                        <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-white transition-all duration-500 group-focus-within:w-full"></div>
+                    </div>
+                </div>
+
+                <button type="submit" class="group relative w-full h-20 bg-white text-black overflow-hidden rounded-2xl font-black text-xs uppercase tracking-[0.3em] transition-all hover:scale-[1.02] active:scale-[0.98] shadow-2xl">
+                    <div class="absolute inset-0 bg-zinc-200 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                    <span class="relative z-10">Desbloquear Sistema</span>
+                </button>
+
+                <p class="text-center text-[9px] text-zinc-600 font-bold uppercase tracking-[0.2em] leading-relaxed">
+                    Acesso restrito a administradores.<br/>IP rastreado para segurança.
+                </p>
+            </form>
+        </div>
+        
+        <!-- Footer Meta -->
+        <div class="mt-12 text-center opacity-30 animate-in fade-in duration-1000 delay-500">
+            <p class="text-[8px] font-black text-zinc-500 uppercase tracking-[0.4em]">© 2026 Inox Link Digital Systems</p>
+        </div>
+    </div>
+</div>

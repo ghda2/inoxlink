@@ -1,0 +1,64 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { db } from '../../db';
+import { categories } from '../../db/schema';
+import { actions } from 'astro:actions';
+
+const allCategories = await db.select().from(categories);
+
+if (Astro.request.method === 'POST') {
+  const data = await Astro.request.formData();
+  const name = data.get('name') as string;
+  const slug = name.toLowerCase().replace(/ /g, '-').normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  
+  await Astro.callAction(actions.createCategory, { name, slug });
+  return Astro.redirect('/admin/categories');
+}
+---
+
+<AdminLayout title="Categorias">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+    <!-- List -->
+    <div class="lg:col-span-2 space-y-6">
+      <div className="bg-zinc-900/50 border border-white/5 rounded-3xl overflow-hidden backdrop-blur-sm">
+        <table class="w-full text-left">
+          <thead>
+            <tr class="border-b border-white/5 bg-black/40">
+              <th class="px-6 py-5 font-black text-zinc-500 text-[10px] uppercase tracking-[0.2em]">Nome</th>
+              <th class="px-6 py-5 font-black text-zinc-500 text-[10px] uppercase tracking-[0.2em] text-right">Ações</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/5">
+            {allCategories.map((cat) => (
+              <tr class="hover:bg-white/[0.02] transition-colors">
+                <td class="px-6 py-5">
+                  <span class="font-bold text-white uppercase tracking-tight">{cat.name}</span>
+                  <span class="text-[10px] text-zinc-600 block font-mono font-bold mt-1 tracking-widest">{cat.slug}</span>
+                </td>
+                <td class="px-6 py-4 text-right">
+                    <button class="text-xs font-black text-red-500/50 hover:text-red-500 uppercase tracking-widest transition-colors" onclick={`if(confirm('Excluir?')) window.location.href='/admin/categories/delete/${cat.id}'`}>Excluir</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Add Form -->
+    <aside>
+      <div class="bg-zinc-900 border border-white/5 rounded-3xl p-8 sticky top-32 space-y-8">
+        <h3 class="text-xs font-black text-white uppercase tracking-[0.2em]">Cadastrar Nova</h3>
+        <form method="POST" class="space-y-6">
+          <div class="space-y-2">
+            <label class="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Nome da Categoria</label>
+            <input type="text" name="name" required class="w-full bg-black border border-white/5 rounded-2xl px-5 py-4 text-white focus:border-white/20 outline-none transition-all font-bold uppercase tracking-tight" />
+          </div>
+          <button type="submit" class="w-full bg-white text-black font-black text-xs uppercase tracking-[0.2em] py-5 rounded-2xl shadow-2xl hover:bg-zinc-200 transition-all active:scale-[0.98]">
+            Criar Categoria
+          </button>
+        </form>
+      </div>
+    </aside>
+  </div>
+</AdminLayout>

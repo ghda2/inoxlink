@@ -1,0 +1,15 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import WikiForm from '../../../components/admin/WikiForm';
+import { db } from '../../../db';
+import { authors } from '../../../db/schema';
+
+const allAuthors = await db.select().from(authors);
+---
+
+<AdminLayout title="Novo Artigo Wiki">
+    <WikiForm 
+        client:load 
+        authors={allAuthors} 
+    />
+</AdminLayout>

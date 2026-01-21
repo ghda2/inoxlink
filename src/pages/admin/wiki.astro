@@ -1,0 +1,39 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { db } from '../../db';
+import { wiki } from '../../db/schema';
+import { desc } from 'drizzle-orm';
+
+const allWiki = await db.select().from(wiki).orderBy(desc(wiki.createdAt));
+---
+
+<AdminLayout title="Wiki Técnica">
+  <div slot="header-actions">
+    <a href="/admin/wiki/new" class="px-8 py-4 bg-white text-black rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-2xl hover:bg-zinc-200 transition-all active:scale-[0.98]">
+      + Novo Artigo
+    </a>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+    {allWiki.map((item) => (
+      <a href={`/admin/wiki/${item.id}`} class="group bg-zinc-900 border border-white/5 p-8 rounded-3xl hover:border-white/20 transition-all">
+        <div class="flex flex-col h-full">
+            <span class="text-[10px] text-zinc-600 font-bold uppercase tracking-[0.2em] mb-4">Artigo Wiki</span>
+            <h3 class="text-2xl font-black text-white uppercase italic tracking-tighter leading-tight group-hover:text-white transition-colors mb-4">{item.title}</h3>
+            <div class="h-0.5 w-12 bg-white/10 group-hover:w-full group-hover:bg-white transition-all duration-500 mb-6"></div>
+            <div class="mt-auto flex items-center justify-between">
+                <span class="text-[10px] font-bold text-zinc-500 font-mono tracking-widest block uppercase">/{item.slug}</span>
+                <span class="text-[10px] font-black text-zinc-800 uppercase tracking-widest group-hover:text-white transition-colors">Editar →</span>
+            </div>
+        </div>
+      </a>
+    ))}
+
+    {allWiki.length === 0 && (
+        <div class="col-span-full border-2 border-dashed border-zinc-900 rounded-[3rem] py-24 flex flex-col items-center justify-center text-center">
+            <h2 class="text-zinc-800 text-4xl font-black italic uppercase tracking-tighter mb-4">Wiki Vazia</h2>
+            <p class="text-zinc-600 text-xs font-bold uppercase tracking-[0.2em]">Comece a documentar seus processos</p>
+        </div>
+    )}
+  </div>
+</AdminLayout>

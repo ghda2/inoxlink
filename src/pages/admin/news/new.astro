@@ -1,0 +1,17 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import NewsForm from '../../../components/admin/NewsForm';
+import { db } from '../../../db';
+import { categories, authors } from '../../../db/schema';
+
+const allCategories = await db.select().from(categories);
+const allAuthors = await db.select().from(authors);
+---
+
+<AdminLayout title="Nova Matéria">
+    <NewsForm 
+        client:load 
+        categories={allCategories} 
+        authors={allAuthors} 
+    />
+</AdminLayout>

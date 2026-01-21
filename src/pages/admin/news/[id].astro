@@ -1,0 +1,26 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import NewsForm from '../../../components/admin/NewsForm';
+import { db } from '../../../db';
+import { news, categories, authors } from '../../../db/schema';
+import { eq } from 'drizzle-orm';
+
+const { id } = Astro.params;
+
+if (!id) return Astro.redirect('/admin');
+
+const item = await db.select().from(news).where(eq(news.id, Number(id)));
+const allCategories = await db.select().from(categories);
+const allAuthors = await db.select().from(authors);
+
+if (!item[0]) return Astro.redirect('/admin');
+---
+
+<AdminLayout title={`Editando: ${item[0].title}`}>
+    <NewsForm 
+        client:load 
+        initialData={item[0]}
+        categories={allCategories} 
+        authors={allAuthors} 
+    />
+</AdminLayout>
