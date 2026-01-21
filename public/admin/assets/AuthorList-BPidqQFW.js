@@ -1,1 +1,0 @@
-import{_ as e}from"./_plugin-vue_export-helper-DlAUqK2U.js";import{a as r,b as o,o as a}from"./index-D2uM6S70.js";const s={};function c(n,t){return a(),r("div",null,[...t[0]||(t[0]=[o("h3",{class:"text-3xl font-black tracking-tighter uppercase italic text-neutral-300"},"Autores (Em breve)",-1)])])}const f=e(s,[["render",c]]);export{f as default};
