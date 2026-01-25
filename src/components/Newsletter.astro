@@ -1,12 +1,18 @@
 ---
+import { Image } from 'astro:assets';
+import newsletterBg from '../assets/newsletter_bg.png';
 ---
 <section class="relative overflow-hidden rounded-[3rem] bg-black text-white p-8 md:p-20">
     <!-- Background Image with Overlay -->
     <div class="absolute inset-0">
-        <img 
-            src="/newsletter_bg.png" 
+        <Image 
+            src={newsletterBg} 
             alt="Newsletter Background" 
             class="w-full h-full object-cover opacity-60"
+            width={1200}
+            format="webp"
+            quality={70}
+            loading="lazy"
         />
         <div class="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent"></div>
     </div>
@@ -14,26 +20,82 @@
     <div class="relative z-10 max-w-2xl space-y-8">
         <div class="space-y-4">
             <h2 class="text-4xl md:text-6xl font-black tracking-tighter italic uppercase leading-tight">
-                MANTENHA-SE <br/> <span class="text-neutral-400">ATUALIZADO</span>
+                MANTENHA-SE <br/> <span class="text-neutral-300">ATUALIZADO</span>
             </h2>
-            <p class="text-neutral-300 text-lg font-medium leading-relaxed">
+            <p class="text-neutral-200 text-lg font-medium leading-relaxed">
                 Receba as notícias mais importantes do setor e novos artigos técnicos da nossa Wiki diretamente no seu e-mail.
             </p>
         </div>
 
-        <form class="flex flex-col sm:flex-row gap-4">
+        <form id="newsletter-form" class="flex flex-col sm:flex-row gap-4" aria-label="Assinar newsletter">
             <input 
+                id="newsletter-email"
+                name="email"
                 type="email" 
                 placeholder="seu@email.com" 
-                class="flex-1 px-6 py-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl text-white placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-white transition-all font-medium"
+                required
+                aria-label="Seu endereço de e-mail"
+                class="flex-1 px-6 py-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl text-white placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-white transition-all font-medium"
             />
-            <button class="px-8 py-4 bg-white text-black text-xs font-black rounded-2xl hover:bg-neutral-200 transition-all uppercase tracking-widest whitespace-nowrap">
+            <button 
+                type="submit"
+                id="newsletter-submit"
+                class="px-8 py-4 bg-white text-black text-xs font-black rounded-2xl hover:bg-neutral-200 transition-all uppercase tracking-widest whitespace-nowrap disabled:opacity-50"
+                aria-label="Inscrever-se na newsletter"
+            >
                 NOTIFICAR-ME
             </button>
         </form>
         
-        <p class="text-[10px] text-neutral-500 font-bold uppercase tracking-widest">
+        <p id="newsletter-message" class="text-[10px] text-neutral-400 font-bold uppercase tracking-widest">
             * Prometemos não enviar spam. Apenas conteúdo de valor.
         </p>
     </div>
 </section>
+
+<script>
+    import { actions } from 'astro:actions';
+
+    const form = document.getElementById('newsletter-form') as HTMLFormElement;
+    const submitBtn = document.getElementById('newsletter-submit') as HTMLButtonElement;
+    const messageEl = document.getElementById('newsletter-message');
+    const emailInput = document.getElementById('newsletter-email') as HTMLInputElement;
+
+    form?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        if (!submitBtn || !messageEl || !emailInput) return;
+
+        const email = emailInput.value;
+        
+        // Reset state
+        submitBtn.disabled = true;
+        const originalText = submitBtn.innerText;
+        submitBtn.innerText = 'ENVIANDO...';
+        messageEl.innerText = '* PROCESSANDO SUA INSCRIÇÃO...';
+        messageEl.classList.remove('text-red-400', 'text-green-400');
+        messageEl.classList.add('text-neutral-400');
+
+        try {
+            const { data, error } = await actions.subscribeNewsletter({ email });
+
+            if (error) {
+                messageEl.innerText = `* ERRO: ${error.message || 'Falha ao processar.'}`;
+                messageEl.classList.add('text-red-400');
+            } else if (data?.success) {
+                messageEl.innerText = `* ${data.message}`;
+                messageEl.classList.add('text-green-400');
+                form.reset();
+            } else {
+                messageEl.innerText = `* ERRO: ${data?.error || 'Tente novamente.'}`;
+                messageEl.classList.add('text-red-400');
+            }
+        } catch (err) {
+            messageEl.innerText = '* ERRO DE CONEXÃO. TENTE NOVAMENTE.';
+            messageEl.classList.add('text-red-400');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerText = originalText;
+        }
+    });
+</script>

@@ -1,0 +1,28 @@
+---
+---
+<!-- Google tag (gtag.js) -->
+<script is:inline>
+  // 1. Initialize dataLayer and gtag
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+
+  // 2. Set default consent (Consent Mode v2)
+  // We set to 'denied' by default for strict compliance, but you can adjust based on your needs.
+  gtag('consent', 'default', {
+    'ad_storage': 'denied',
+    'ad_user_data': 'denied',
+    'ad_personalization': 'denied',
+    'analytics_storage': 'denied',
+    'wait_for_update': 500 // Optional: Wait up to 500ms for a CMP update
+  });
+
+  // 3. Load the Google Tag script
+  const script = document.createElement('script');
+  script.async = true;
+  script.src = "https://www.googletagmanager.com/gtag/js?id=G-LRWXFHZL17";
+  document.head.appendChild(script);
+
+  // 4. Config
+  gtag('js', new Date());
+  gtag('config', 'G-LRWXFHZL17');
+</script>

@@ -2,7 +2,23 @@
 import AdminLayout from '../../../layouts/AdminLayout.astro';
 import ContentForm from '../../../components/admin/ContentForm';
 import { db } from '../../../db';
-import { categories, authors } from '../../../db/schema';
+import { wiki, categories, authors } from '../../../db/schema';
+import { eq } from 'drizzle-orm';
+
+const { id } = Astro.params;
+
+if (!id || isNaN(Number(id))) {
+    return Astro.redirect('/admin/wiki');
+}
+
+const [wikiArticle] = await db.select()
+    .from(wiki)
+    .where(eq(wiki.id, Number(id)))
+    .limit(1);
+
+if (!wikiArticle) {
+    return Astro.redirect('/admin/wiki');
+}
 
 const allCategories = await db.select().from(categories).orderBy(categories.name);
 const allAuthors = await db.select().from(authors).orderBy(authors.name);
@@ -10,9 +26,10 @@ const allAuthors = await db.select().from(authors).orderBy(authors.name);
 export const prerender = false;
 ---
 
-<AdminLayout title="Novo Artigo Wiki">
+<AdminLayout title={`Editar: ${wikiArticle.title}`}>
     <ContentForm 
         type="wiki"
+        initialData={wikiArticle}
         categories={allCategories}
         authors={allAuthors}
         client:load

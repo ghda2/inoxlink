@@ -1,68 +1,200 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { db } from '../../db';
-import { wiki } from '../../db/schema';
-import { desc } from 'drizzle-orm';
+import { wiki, categories } from '../../db/schema';
+import { desc, eq } from 'drizzle-orm';
+import { Image } from 'astro:assets';
 
-const allWiki = await db.select().from(wiki).orderBy(desc(wiki.createdAt));
+// Get selected category from URL
+const selectedCategorySlug = Astro.url.searchParams.get('categoria');
 
-export const prerender = false;
+// Fetch all categories
+const allCategories = await db.select().from(categories).orderBy(categories.name);
+
+// Fetch wiki articles - filtered by category if selected
+// Fetch wiki articles - filtered by category if selected
+let allWiki;
+let pageTitle = "Inox Wiki - Enciclopédia Técnica do Aço Inoxidável";
+let pageDescription = "Sua fonte definitiva de conhecimento especializado sobre o aço inoxidável. Descubra normas técnicas, tipos de aço (AISI 304, 316, 430), processos de acabamento e muito mais.";
+
+if (selectedCategorySlug) {
+    // Find the category by slug
+    const [selectedCategory] = await db.select()
+        .from(categories)
+        .where(eq(categories.slug, selectedCategorySlug))
+        .limit(1);
+    
+    if (selectedCategory) {
+        // Update metadata for category page
+        pageTitle = `${selectedCategory.name} - Inox Wiki | Inox Link`;
+        pageDescription = `Artigos técnicos e guias especializados sobre ${selectedCategory.name} em aço inoxidável. Confira tudo sobre ${selectedCategory.name} na Inox Wiki.`;
+
+        // Fetch wiki articles filtered by category
+        allWiki = await db.select()
+            .from(wiki)
+            .where(eq(wiki.categoryId, selectedCategory.id))
+            .orderBy(desc(wiki.createdAt));
+    } else {
+        // Category not found, show all
+        allWiki = await db.select().from(wiki).orderBy(desc(wiki.createdAt));
+    }
+} else {
+    // No filter, show all
+    allWiki = await db.select().from(wiki).orderBy(desc(wiki.createdAt));
+}
+
+const canonicalUrl = selectedCategorySlug 
+    ? `https://inoxlink.com.br/wiki?categoria=${selectedCategorySlug}`
+    : "https://inoxlink.com.br/wiki";
 ---
 
-<Layout title="Inox Wiki" description="Sua fonte definitiva de conhecimento técnico sobre aço inoxidável.">
-    <div class="space-y-16">
+<Layout 
+    title={pageTitle}
+    description={pageDescription}
+    canonicalUrl={canonicalUrl}>
+    <div class="bg-white">
         <!-- Header -->
-        <header class="space-y-8 max-w-4xl">
-            <div class="space-y-4">
-                <div class="inline-flex items-center gap-2 px-3 py-1 bg-black text-white rounded-full text-[10px] font-black uppercase tracking-[0.2em]">
-                    <span class="relative flex h-2 w-2">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
-                    </span>
-                    Base de Conhecimento
+        <section class="border-b border-zinc-100">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+                <div class="max-w-3xl space-y-6">
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-50 rounded-full border border-emerald-100">
+                        <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-emerald-700">Base de Conhecimento</span>
+                    </div>
+                    
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight text-zinc-900">
+                        {selectedCategorySlug && pageTitle.includes('-') ? pageTitle.split('-')[0].trim() : 'Inox Wiki'}
+                    </h1>
+                    
+                    <p class="text-lg sm:text-xl text-zinc-700 leading-relaxed font-medium">
+                        {selectedCategorySlug 
+                            ? pageDescription
+                            : "Explore normas técnicas, processos de fabricação e especificações de ligas metálicas com a curadoria dos nossos especialistas."}
+                    </p>
+
+                    <!-- Search Bar -->
+                    <div class="relative max-w-2xl pt-4">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                        <input 
+                            type="text" 
+                            placeholder="Pesquisar ligas, acabamentos, processos..." 
+                            class="block w-full pl-12 pr-4 py-3.5 bg-white border border-zinc-200 rounded-xl text-sm font-medium placeholder:text-zinc-500 focus:ring-2 focus:ring-zinc-900 focus:border-transparent transition-all shadow-sm"
+                        />
+                    </div>
                 </div>
-                <h1 class="text-5xl md:text-7xl font-black tracking-tighter italic uppercase leading-[0.9]">Inox Wiki</h1>
-                <p class="text-neutral-500 text-lg md:text-xl font-medium leading-relaxed">
-                    Explore normas técnicas, processos de fabricação e especificações de ligas metálicas com a curadoria dos nossos especialistas.
-                </p>
+            </div>
+        </section>
+
+        <!-- Category Filters -->
+        {allCategories.length > 0 && (
+            <section class="border-b border-zinc-100">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                    <div class="flex items-center gap-3 overflow-x-auto pb-2">
+                        <span class="text-xs font-bold text-zinc-600 uppercase tracking-widest whitespace-nowrap">Filtrar por:</span>
+                        <a 
+                            href="/wiki" 
+                            class={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap ${
+                                !selectedCategorySlug 
+                                    ? 'bg-black text-white shadow-lg' 
+                                    : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
+                            }`}
+                        >
+                            Todos
+                        </a>
+                        {allCategories.map((cat) => (
+                            <a 
+                                href={`/wiki?categoria=${cat.slug}`}
+                                class={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap ${
+                                    selectedCategorySlug === cat.slug
+                                        ? 'bg-black text-white shadow-lg' 
+                                        : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
+                                }`}
+                            >
+                                {cat.name}
+                            </a>
+                        ))}
+                    </div>
+                </div>
+            </section>
+        )}
+
+        <!-- Articles Grid -->
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-20">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                {allWiki.map((item, index) => (
+                    <article>
+                        <a href={`/wiki/${item.slug}`} class="group block h-full">
+                            <div class="h-full flex flex-col p-6 lg:p-8 bg-white border border-zinc-100 rounded-2xl hover:border-zinc-200 hover:shadow-lg hover:shadow-zinc-100 transition-all duration-300">
+                                <!-- Image or Icon -->
+                                <div class="mb-6">
+                                    {item.imageUrl ? (
+                                        <div class="relative aspect-video overflow-hidden rounded-xl border border-zinc-100 mb-4">
+                                            <Image 
+                                                src={item.imageUrl} 
+                                                alt={item.title} 
+                                                width={400} 
+                                                height={225} 
+                                                loading={index < 3 ? "eager" : "lazy"}
+                                                fetchpriority={index === 0 ? "high" : "auto"}
+                                                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
+                                            />
+                                        </div>
+                                    ) : (
+                                        <div class="w-12 h-12 bg-zinc-50 rounded-xl flex items-center justify-center border border-zinc-100 group-hover:bg-zinc-900 group-hover:border-zinc-900 transition-all duration-300">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-500 group-hover:text-white transition-colors">
+                                                <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
+                                            </svg>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <!-- Content -->
+                                <div class="flex-1 space-y-3">
+                                    <h2 class="text-xl font-bold tracking-tight leading-tight text-zinc-900 group-hover:text-zinc-700 transition-colors line-clamp-2 uppercase">
+                                        {item.title}
+                                    </h2>
+                                    <p class="text-sm text-zinc-600 line-clamp-3 leading-relaxed font-medium">
+                                        {item.content.replace(/<[^>]*>/g, '').substring(0, 150)}...
+                                    </p>
+                                </div>
+
+                                <!-- Footer -->
+                                <div class="pt-6 mt-6 border-t border-zinc-50 flex items-center justify-between">
+                                    <span class="text-xs text-zinc-600 font-bold">
+                                        {new Date(item.createdAt || '').toLocaleDateString('pt-BR', { 
+                                            day: 'numeric', 
+                                            month: 'short',
+                                            year: 'numeric'
+                                        })}
+                                    </span>
+                                    <span class="text-xs font-bold text-zinc-900 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 uppercase">
+                                        Ler artigo
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform group-hover:translate-x-0.5">
+                                            <line x1="5" x2="19" y1="12" y2="12"/>
+                                            <polyline points="12 5 19 12 12 19"/>
+                                        </svg>
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    </article>
+                ))}
             </div>
 
-            <!-- Search Bar UI (Visual) -->
-            <div class="relative max-w-2xl">
-                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <svg class="h-5 w-5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            {allWiki.length === 0 && (
+                <div class="py-20 text-center">
+                    <div class="inline-flex w-16 h-16 bg-zinc-100 rounded-full items-center justify-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-400">
+                            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
+                        </svg>
+                    </div>
+                    <p class="text-zinc-600 font-bold uppercase tracking-widest text-sm">Nenhum artigo publicado ainda.</p>
                 </div>
-                <input 
-                    type="text" 
-                    placeholder="Pesquisar ligas, acabamentos ou processos..." 
-                    class="block w-full pl-12 pr-4 py-4 bg-white border border-neutral-200 rounded-2xl text-sm font-medium focus:ring-2 focus:ring-black focus:border-transparent transition-all shadow-sm"
-                />
-            </div>
-        </header>
-
-        <!-- Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {allWiki.map((item) => (
-                <a href={`/wiki/${item.slug}`} class="group relative flex flex-col justify-between p-8 bg-white border border-neutral-100 rounded-[2rem] hover:shadow-2xl hover:shadow-black/5 transition-all duration-500 hover:-translate-y-2">
-                    <div class="space-y-6">
-                        <div class="w-12 h-12 bg-neutral-50 rounded-2xl flex items-center justify-center group-hover:bg-black group-hover:rotate-12 transition-all duration-500 border border-neutral-100">
-                            <span class="text-black font-black text-xl group-hover:text-white transition-colors">W</span>
-                        </div>
-                        <div class="space-y-3">
-                            <h2 class="text-2xl font-black tracking-tighter italic uppercase leading-tight">
-                                {item.title}
-                            </h2>
-                            <p class="text-neutral-500 font-medium text-sm leading-relaxed line-clamp-3">
-                                {item.content.replace(/<[^>]*>/g, '')}
-                            </p>
-                        </div>
-                    </div>
-                    <div class="pt-8 flex items-center justify-between">
-                        <span class="text-[10px] font-black text-black uppercase tracking-widest border-b-2 border-black/10 group-hover:border-black transition-colors">Ver Completo</span>
-                        <svg class="w-5 h-5 transform -translate-x-2 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
-                    </div>
-                </a>
-            ))}
-        </div>
+            )}
+        </section>
     </div>
 </Layout>

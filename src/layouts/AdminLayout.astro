@@ -1,5 +1,7 @@
 ---
 import '../styles/global.css';
+import GoogleTag from '../components/GoogleTag.astro';
+import ConsentBanner from '../components/ConsentBanner.astro';
 
 interface Props {
   title: string;
@@ -9,41 +11,41 @@ const { title } = Astro.props;
 ---
 
 <!DOCTYPE html>
-<html lang="pt-BR" class="dark">
+<html lang="pt-BR">
   <head>
+    <GoogleTag />
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
-    <title>{title} | Admin Inox Link</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>{title} | Inox Link Admin</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon_inox_link.svg" />
+    <link rel="apple-touch-icon" href="/favicon_inox_link.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style is:global>
       :root {
-        --admin-bg: #000000;
-        --admin-card: #0a0a0a;
-        --admin-border: #1a1a1a;
-        --admin-highlight: #ffffff;
-        --admin-text-dim: #a1a1aa;
+        --admin-bg: #fcfcfc;
+        --admin-card: #ffffff;
+        --admin-border: #f0f0f0;
+        --admin-text: #111111;
+        --admin-text-dim: #71717a;
+        --admin-accent: #000000;
       }
       
       body {
         background-color: var(--admin-bg);
-        color: var(--admin-highlight);
+        color: var(--admin-text);
       }
 
-      /* Custom scrollbar */
       ::-webkit-scrollbar {
-        width: 8px;
+        width: 6px;
       }
       ::-webkit-scrollbar-track {
         background: var(--admin-bg);
       }
       ::-webkit-scrollbar-thumb {
-        background: var(--admin-border);
-        border-radius: 4px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #333;
+        background: #e5e5e5;
+        border-radius: 10px;
       }
     </style>
   </head>
@@ -51,58 +53,56 @@ const { title } = Astro.props;
     <div class="flex flex-col lg:flex-row min-h-screen">
       
       <!-- Mobile Navbar -->
-      <nav class="lg:hidden sticky top-0 z-[100] bg-black/80 backdrop-blur-xl border-b border-white/5 p-4 flex justify-between items-center">
-        <div class="flex items-center gap-3">
-            <div class="w-8 h-8 bg-white rounded flex items-center justify-center font-black text-black text-sm">IL</div>
-            <span class="font-bold text-lg tracking-tighter">ADMIN</span>
+      <nav class="lg:hidden sticky top-0 z-[100] bg-white/80 backdrop-blur-xl border-b border-zinc-100 p-4 flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <span class="font-black text-lg tracking-tighter">INOX LINK</span>
+            <span class="text-[10px] bg-zinc-100 px-2 py-0.5 rounded-full font-bold text-zinc-500 uppercase">Admin</span>
         </div>
-        <button id="mobile-menu-toggle" class="p-2 text-white">
+        <button id="mobile-menu-toggle" class="p-2 text-zinc-900">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg>
         </button>
       </nav>
 
       <!-- Sidebar -->
-      <aside id="sidebar" class="fixed lg:sticky top-0 inset-y-0 left-0 z-[110] w-[85vw] lg:w-72 bg-black border-r border-white/5 flex flex-col -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out">
+      <aside id="sidebar" class="fixed lg:sticky top-0 inset-y-0 left-0 z-[110] w-[80vw] lg:w-64 bg-white border-r border-zinc-100 flex flex-col -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out">
         <div class="p-8 flex flex-col h-full">
-            <div class="flex items-center justify-between mb-12">
-                <div class="flex items-center gap-4">
-                    <div class="w-10 h-10 bg-white rounded-xl shadow-2xl flex items-center justify-center font-black text-black">IL</div>
-                    <div class="flex flex-col">
-                        <span class="font-bold text-lg tracking-tighter leading-none">INOX LINK</span>
-                        <span class="text-[10px] text-zinc-500 font-bold tracking-[0.2em] mt-1">SISTEMA ADMIN</span>
-                    </div>
+            <div class="flex items-center justify-between mb-10">
+                <div class="flex flex-col">
+                    <span class="font-black text-xl tracking-tighter leading-none">INOX LINK</span>
+                    <span class="text-[9px] text-zinc-400 font-bold tracking-[0.2em] mt-1.5 uppercase">Painel de Controle</span>
                 </div>
-                <button id="mobile-menu-close" class="lg:hidden p-2 text-zinc-500 hover:text-white transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                <button id="mobile-menu-close" class="lg:hidden p-2 text-zinc-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                 </button>
             </div>
 
-            <nav class="flex flex-col gap-2 flex-1">
-                <a href="/admin" class="group px-4 py-3 rounded-xl hover:bg-white/5 transition-all flex items-center gap-4 text-zinc-400 hover:text-white">
-                    <div class="w-1.5 h-1.5 rounded-full bg-zinc-800 group-hover:bg-white transition-colors"></div>
-                    <span class="font-medium">Início</span>
+            <nav class="flex flex-col gap-1 flex-1 text-sm">
+                <a href="/admin" class="group px-4 py-2.5 rounded-lg hover:bg-zinc-50 transition-all flex items-center gap-3 text-zinc-500 hover:text-black">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-50 group-hover:opacity-100"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    <span class="font-medium">Dashboard</span>
                 </a>
-                <a href="/admin/news" class="group px-4 py-3 rounded-xl bg-white/5 text-white flex items-center gap-4">
-                    <div class="w-1.5 h-1.5 rounded-full bg-white"></div>
-                    <span class="font-bold tracking-tight">Matérias</span>
+                <a href="/admin/news" class="group px-4 py-2.5 rounded-lg hover:bg-zinc-50 transition-all flex items-center gap-3 text-zinc-500 hover:text-black">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-50 group-hover:opacity-100"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></svg>
+                    <span class="font-medium">Matérias</span>
                 </a>
-                <a href="/admin/wiki" class="group px-4 py-3 rounded-xl hover:bg-white/5 transition-all flex items-center gap-4 text-zinc-400 hover:text-white">
-                    <div class="w-1.5 h-1.5 rounded-full bg-zinc-800 group-hover:bg-white transition-colors"></div>
+                <a href="/admin/wiki" class="group px-4 py-2.5 rounded-lg hover:bg-zinc-50 transition-all flex items-center gap-3 text-zinc-500 hover:text-black">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-50 group-hover:opacity-100"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M8 7h6"/><path d="M8 11h8"/></svg>
                     <span class="font-medium">Wiki</span>
                 </a>
-                <a href="/admin/categories" class="group px-4 py-3 rounded-xl hover:bg-white/5 transition-all flex items-center gap-4 text-zinc-400 hover:text-white">
-                    <div class="w-1.5 h-1.5 rounded-full bg-zinc-800 group-hover:bg-white transition-colors"></div>
+                <a href="/admin/categories" class="group px-4 py-2.5 rounded-lg hover:bg-zinc-50 transition-all flex items-center gap-3 text-zinc-500 hover:text-black">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-50 group-hover:opacity-100"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
                     <span class="font-medium">Categorias</span>
                 </a>
             </nav>
 
-            <div class="pt-8 border-t border-white/5 space-y-4">
-                <a href="/" class="text-xs font-bold text-zinc-500 hover:text-white transition-colors tracking-widest uppercase block pl-4">
-                    Visualizar Site →
+            <div class="pt-6 border-t border-zinc-100 space-y-2">
+                <a href="/" target="_blank" class="text-[11px] font-bold text-zinc-400 hover:text-black transition-colors tracking-wider uppercase flex items-center gap-2 px-4 py-2">
+                    Visualizar Site
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
                 </a>
                 <form action="/admin/logout" method="POST">
-                    <button type="submit" class="w-full text-left px-4 py-3 text-xs font-bold text-red-500 hover:text-red-400 transition-colors tracking-widest uppercase">
-                        Desconectar
+                    <button type="submit" class="w-full text-left px-4 py-2 text-[11px] font-bold text-red-400 hover:text-red-600 transition-colors tracking-wider uppercase">
+                        Sair do Painel
                     </button>
                 </form>
             </div>
@@ -110,22 +110,21 @@ const { title } = Astro.props;
       </aside>
 
       <!-- Overlay (Mobile Only) -->
-      <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[105] hidden lg:hidden"></div>
+      <div id="sidebar-overlay" class="fixed inset-0 bg-black/10 backdrop-blur-[2px] z-[105] hidden lg:hidden"></div>
 
-      <!-- Main Content -->
-      <main class="flex-1 min-w-0 bg-black">
-        <div class="max-w-6xl mx-auto p-6 lg:p-12">
-            <header class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
+      <main class="flex-1 min-w-0">
+        <div class="max-w-[1400px] mx-auto p-6 lg:p-14">
+            <header class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
                 <div>
-                    <h1 class="text-4xl lg:text-5xl font-black tracking-tighter text-white uppercase italic">{title}</h1>
-                    <div class="h-1 w-20 bg-white mt-4"></div>
+                    <h1 class="text-3xl font-bold tracking-tight text-zinc-900">{title}</h1>
+                    <p class="text-sm text-zinc-400 mt-1 font-medium">Gestão de conteúdo Inox Link</p>
                 </div>
-                <div class="flex items-center gap-4">
+                <div class="flex items-center gap-3">
                     <slot name="header-actions" />
                 </div>
             </header>
             
-            <div class="animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div class="animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <slot />
             </div>
         </div>
@@ -154,5 +153,6 @@ const { title } = Astro.props;
         close?.addEventListener('click', closeMenu);
         overlay?.addEventListener('click', closeMenu);
     </script>
+    <ConsentBanner />
   </body>
 </html>

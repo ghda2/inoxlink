@@ -1,0 +1,93 @@
+---
+import { truncate } from '../utils/seo-helpers';
+
+interface Props {
+  title: string;
+  description: string;
+  image?: string;
+  canonicalUrl?: string;
+  type?: 'website' | 'article' | 'profile';
+  publishedTime?: string;
+  modifiedTime?: string;
+  authorName?: string;
+  noindex?: boolean;
+  jsonLd?: object;
+  breadcrumbs?: { name: string; item: string }[];
+}
+
+const {
+  title = '',
+  description,
+  image = '/og-default.jpg',
+  canonicalUrl = Astro.url.href,
+  type = 'website',
+  publishedTime,
+  modifiedTime,
+  authorName,
+  noindex = false,
+  jsonLd,
+  breadcrumbs,
+} = Astro.props;
+
+// Only append | Inox Link if it's not already in the title
+const siteTitle = title.includes('Inox Link') ? title : `${title} | Inox Link`;
+
+// Generate BreadcrumbList JSON-LD
+const breadcrumbLd = breadcrumbs ? {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": breadcrumbs.map((bc, index) => ({
+    "@type": "ListItem",
+    "position": index + 1,
+    "name": bc.name,
+    "item": bc.item.startsWith('http') ? bc.item : `${Astro.url.origin}${bc.item}`
+  }))
+} : null;
+---
+
+<!-- Primary Meta Tags -->
+<title>{siteTitle}</title>
+<meta name="title" content={siteTitle} />
+<meta name="description" content={truncate(description, 160)} />
+<link rel="canonical" href={canonicalUrl} />
+
+<!-- Robots -->
+{noindex ? (
+  <meta name="robots" content="noindex, nofollow" />
+) : (
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+)}
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content={type} />
+<meta property="og:url" content={canonicalUrl} />
+<meta property="og:title" content={siteTitle} />
+<meta property="og:description" content={truncate(description, 160)} />
+<meta property="og:image" content={new URL(image, Astro.url.origin)} />
+<meta property="og:site_name" content="Inox Link" />
+<meta property="og:locale" content="pt_BR" />
+
+{publishedTime && <meta property="article:published_time" content={publishedTime} />}
+{modifiedTime && <meta property="article:modified_time" content={modifiedTime} />}
+{authorName && <meta property="article:author" content={authorName} />}
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image" />
+<meta property="twitter:url" content={canonicalUrl} />
+<meta property="twitter:title" content={siteTitle} />
+<meta property="twitter:description" content={truncate(description, 160)} />
+<meta property="twitter:image" content={new URL(image, Astro.url.origin)} />
+
+<!-- Theme & Favicons -->
+<meta name="theme-color" content="#ffffff" />
+<link rel="icon" type="image/svg+xml" href="/favicon_inox_link.svg" />
+<link rel="apple-touch-icon" href="/favicon_inox_link.svg" />
+<link rel="manifest" href="/manifest.json" />
+
+<!-- JSON-LD -->
+{jsonLd && (
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+)}
+{breadcrumbLd && (
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />
+)}

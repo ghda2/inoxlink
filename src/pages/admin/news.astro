@@ -9,45 +9,51 @@ const allNews = await db.select().from(news).orderBy(desc(news.createdAt));
 
 <AdminLayout title="Matérias">
   <div slot="header-actions">
-    <a href="/admin/news/new" class="px-8 py-4 bg-white text-black rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-2xl hover:bg-zinc-200 transition-all active:scale-[0.98]">
-      + Criar Novo
+    <a href="/admin/news/new" class="px-6 py-3 bg-black text-white rounded-xl font-bold text-xs tracking-tight shadow-lg shadow-zinc-200 hover:bg-zinc-800 transition-all active:scale-[0.98]">
+      + Criar Nova
     </a>
   </div>
 
-  <div class="bg-zinc-900/50 border border-white/5 rounded-[2rem] overflow-hidden backdrop-blur-sm">
+  <div class="bg-white border border-zinc-100 rounded-2xl overflow-hidden shadow-sm shadow-zinc-200/50">
     <div class="overflow-x-auto">
         <table class="w-full text-left min-w-[600px]">
           <thead>
-            <tr class="border-b border-white/5 bg-black/40">
-              <th class="px-8 py-6 font-black text-zinc-500 text-[10px] uppercase tracking-[0.2em]">Conteúdo</th>
-              <th class="px-8 py-6 font-black text-zinc-500 text-[10px] uppercase tracking-[0.2em]">Status</th>
-              <th class="px-8 py-6 font-black text-zinc-500 text-[10px] uppercase tracking-[0.2em]">Data</th>
-              <th class="px-8 py-6 font-black text-zinc-500 text-[10px] uppercase tracking-[0.2em] text-right">Ações</th>
+            <tr class="border-b border-zinc-100 bg-zinc-50/50">
+              <th class="px-8 py-5 font-bold text-zinc-400 text-[10px] uppercase tracking-widest leading-none">Conteúdo</th>
+              <th class="px-8 py-5 font-bold text-zinc-400 text-[10px] uppercase tracking-widest leading-none">Status</th>
+              <th class="px-8 py-5 font-bold text-zinc-400 text-[10px] uppercase tracking-widest leading-none">Data</th>
+              <th class="px-8 py-5 font-bold text-zinc-400 text-[10px] uppercase tracking-widest leading-none text-right">Ações</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-white/5">
+          <tbody class="divide-y divide-zinc-50">
             {allNews.map((item) => (
-              <tr class="hover:bg-white/[0.02] transition-colors group">
-                <td class="px-8 py-6">
-                  <span class="font-bold text-lg text-white block uppercase tracking-tight group-hover:text-white transition-colors">{item.title}</span>
-                  <span class="text-[10px] text-zinc-600 font-mono font-bold tracking-widest mt-1 block">URL: /{item.slug}</span>
+              <tr class="hover:bg-zinc-50/30 transition-colors group">
+                <td class="px-8 py-5">
+                  <span class="font-bold text-base text-zinc-900 block tracking-tight group-hover:text-black transition-colors">{item.title}</span>
+                  <span class="text-[10px] text-zinc-400 font-medium mt-0.5 block italic">{item.slug}</span>
                 </td>
-                <td class="px-8 py-6">
+                <td class="px-8 py-5">
                   {item.published ? (
-                    <span class="px-3 py-1.5 bg-white text-black text-[9px] font-black uppercase tracking-widest rounded-md">Publicado</span>
+                    <span class="px-2.5 py-1 bg-green-50 text-green-600 text-[9px] font-bold uppercase tracking-wider rounded-md">Ativo</span>
                   ) : (
-                    <span class="px-3 py-1.5 border border-white/10 text-zinc-500 text-[9px] font-black uppercase tracking-widest rounded-md">Draft</span>
+                    <span class="px-2.5 py-1 bg-zinc-100 text-zinc-400 text-[9px] font-bold uppercase tracking-wider rounded-md">Rascunho</span>
                   )}
                 </td>
-                <td class="px-8 py-6">
-                  <span class="text-[10px] font-black text-zinc-500 uppercase tracking-widest leading-none">
+                <td class="px-8 py-5">
+                  <span class="text-[11px] font-medium text-zinc-500">
                     {new Date(item.createdAt || '').toLocaleDateString('pt-BR')}
                   </span>
                 </td>
-                <td class="px-8 py-6 text-right">
-                    <div class="flex justify-end gap-6 uppercase text-[10px] font-black tracking-widest">
-                        <a href={`/admin/news/${item.id}`} class="text-zinc-500 hover:text-white transition-colors">Editar</a>
-                        <button class="text-red-500/50 hover:text-red-500 transition-colors" onclick={`if(confirm('Tem certeza?')) window.location.href='/admin/news/delete/${item.id}'`}>Deletar</button>
+                <td class="px-8 py-5 text-right">
+                    <div class="flex justify-end gap-5 text-[11px] font-bold items-center">
+                        <a href={`/admin/news/${item.id}`} class="text-zinc-400 hover:text-black transition-colors">Editar</a>
+                        <button 
+                          class="text-zinc-300 hover:text-red-600 transition-colors delete-news" 
+                          data-id={item.id}
+                          data-title={item.title}
+                        >
+                          Deletar
+                        </button>
                     </div>
                 </td>
               </tr>
@@ -55,9 +61,9 @@ const allNews = await db.select().from(news).orderBy(desc(news.createdAt));
 
             {allNews.length === 0 && (
               <tr>
-                <td colspan="4" class="px-8 py-20 text-center">
-                  <div class="text-zinc-800 text-4xl font-black italic uppercase tracking-tighter mb-2">Sem Matérias</div>
-                  <p class="text-zinc-600 text-[10px] font-bold uppercase tracking-[0.2em]">Seu jornalismo começa no botão ali em cima</p>
+                <td colspan="4" class="px-8 py-24 text-center">
+                  <div class="text-zinc-200 text-3xl font-bold tracking-tighter mb-1">Nenhuma matéria</div>
+                  <p class="text-zinc-400 text-xs font-medium">Use o botão acima para começar a escrever.</p>
                 </td>
               </tr>
             )}
@@ -66,3 +72,27 @@ const allNews = await db.select().from(news).orderBy(desc(news.createdAt));
     </div>
   </div>
 </AdminLayout>
+
+<script>
+  import { actions } from 'astro:actions';
+
+  document.querySelectorAll('.delete-news').forEach(button => {
+    button.addEventListener('click', async () => {
+      const id = button.getAttribute('data-id');
+      const title = button.getAttribute('data-title');
+      
+      if (confirm(`Tem certeza que deseja excluir a matéria "${title}"?`)) {
+        try {
+          const { error } = await actions.deleteNews({ id: Number(id) });
+          if (error) {
+            alert('Falha ao excluir: ' + error.message);
+          } else {
+            window.location.reload();
+          }
+        } catch (err) {
+          alert('Erro inesperado ao excluir.');
+        }
+      }
+    });
+  });
+</script>

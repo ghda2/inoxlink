@@ -9,45 +9,51 @@ const publishedCount = await db.select({ value: count() }).from(news).where(eq(n
 const draftsCount = (newsCount[0]?.value || 0) - (publishedCount[0]?.value || 0);
 ---
 
-<AdminLayout title="Dashboard">
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-    <div class="bg-zinc-900 border border-white/5 p-10 rounded-[2.5rem] relative overflow-hidden group">
+<AdminLayout title="Resumo">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+    <div class="bg-white border border-zinc-100 p-8 rounded-2xl relative overflow-hidden group hover:border-zinc-200 transition-all shadow-sm shadow-zinc-200/50">
         <div class="relative z-10">
-            <span class="text-[10px] font-black text-zinc-600 uppercase tracking-[0.3em] mb-4 block">Total de Matérias</span>
-            <div class="text-7xl font-black italic tracking-tighter text-white uppercase">{newsCount[0]?.value || 0}</div>
+            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-3 block">Total de Matérias</span>
+            <div class="text-5xl font-bold tracking-tight text-zinc-900">{newsCount[0]?.value || 0}</div>
         </div>
-        <div class="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
-            <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></svg>
+        <div class="absolute top-6 right-6 text-zinc-50 opacity-0 group-hover:opacity-100 transition-opacity">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-200"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></svg>
         </div>
     </div>
 
-    <div class="bg-white p-10 rounded-[2.5rem] relative overflow-hidden group">
+    <div class="bg-white border border-zinc-100 p-8 rounded-2xl relative overflow-hidden group hover:border-zinc-200 transition-all shadow-sm shadow-zinc-200/50">
         <div class="relative z-10">
-            <span class="text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em] mb-4 block">No Ar (Live)</span>
-            <div class="text-7xl font-black italic tracking-tighter text-black uppercase">{publishedCount[0]?.value || 0}</div>
+            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-3 block">Publicadas</span>
+            <div class="text-5xl font-bold tracking-tight text-zinc-900">{publishedCount[0]?.value || 0}</div>
         </div>
-        <div class="absolute top-0 right-0 p-8 opacity-10">
-            <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-black"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+        <div class="absolute top-6 right-6 text-zinc-50 opacity-0 group-hover:opacity-100 transition-opacity">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-200"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
         </div>
     </div>
 
-    <div class="bg-zinc-900 border border-white/5 p-10 rounded-[2.5rem] relative overflow-hidden group">
+    <div class="bg-white border border-zinc-100 p-8 rounded-2xl relative overflow-hidden group hover:border-zinc-200 transition-all shadow-sm shadow-zinc-200/50">
         <div class="relative z-10">
-            <span class="text-[10px] font-black text-zinc-600 uppercase tracking-[0.3em] mb-4 block">Rascunhos</span>
-            <div class="text-7xl font-black italic tracking-tighter text-white uppercase">{draftsCount}</div>
+            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-3 block">Rascunhos</span>
+            <div class="text-5xl font-bold tracking-tight text-zinc-900">{draftsCount}</div>
         </div>
-        <div class="absolute top-0 right-0 p-8 opacity-5">
-            <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        <div class="absolute top-6 right-6 text-zinc-50 opacity-0 group-hover:opacity-100 transition-opacity">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-200"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
         </div>
     </div>
   </div>
 
-  <div class="flex flex-col lg:flex-row gap-8">
-    <div class="flex-1 bg-zinc-900/40 border border-white/5 border-dashed rounded-[3rem] p-12 flex flex-col items-center justify-center text-center">
-        <h2 class="text-3xl font-black italic uppercase tracking-tighter text-white mb-6">Pronto para escrever?</h2>
-        <a href="/admin/news/new" class="bg-white text-black px-12 py-5 rounded-2xl font-black text-sm uppercase tracking-[0.2em] hover:bg-zinc-200 transition-all shadow-2xl active:scale-[0.98]">
-            Nova Matéria →
-        </a>
+  <div class="flex flex-col lg:flex-row gap-6">
+    <div class="flex-1 bg-white border border-zinc-100 border-dashed rounded-[2rem] p-16 flex flex-col items-center justify-center text-center">
+        <h2 class="text-2xl font-bold tracking-tight text-zinc-900 mb-2">Novo Conteúdo</h2>
+        <p class="text-zinc-400 text-sm mb-8 max-w-sm">Comece a redigir uma nova matéria para o portal ou documentação para a Wiki.</p>
+        <div class="flex gap-4">
+            <a href="/admin/news/new" class="bg-black text-white px-8 py-3.5 rounded-xl font-bold text-sm tracking-tight hover:bg-zinc-800 transition-all shadow-lg active:scale-[0.98]">
+                Nova Matéria
+            </a>
+            <a href="/admin/wiki/new" class="bg-zinc-100 text-zinc-600 px-8 py-3.5 rounded-xl font-bold text-sm tracking-tight hover:bg-zinc-200 transition-all active:scale-[0.98]">
+                Novo Wiki
+            </a>
+        </div>
     </div>
   </div>
 </AdminLayout>

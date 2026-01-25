@@ -19,12 +19,13 @@ export default function ImageUpload({ value, onChange, label = 'Imagem' }: Image
 
         const formData = new FormData();
         formData.append('file', file);
-        formData.append('upload_preset', 'ml_default'); // Você precisará criar um 'unsigned upload preset' no Cloudinary
+        // O preset costuma ser 'ml_default' por padrão em novas contas, 
+        // mas deve ser configurado como "Unsigned" no painel do Cloudinary
+        formData.append('upload_preset', 'ml_default');
 
         try {
-            // Usando a API direta do Cloudinary (Client-side upload)
-            // Substitua 'gabrielsantos' pelo seu Cloud Name do Cloudinary
-            const cloudName = 'gabrielsantos'; // Nome da sua conta no Cloudinary
+            const cloudName = import.meta.env.PUBLIC_CLOUDINARY_CLOUD_NAME || 'djzqwht5b';
+
             const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
                 method: 'POST',
                 body: formData,
@@ -33,14 +34,16 @@ export default function ImageUpload({ value, onChange, label = 'Imagem' }: Image
             const data = await response.json();
 
             if (data.secure_url) {
-                // Otimização: Podemos adicionar parâmetros de transformação na URL
-                // f_auto = formato automático (webp/avif), q_auto = qualidade automática
+                // Otimização: f_auto/q_auto para performance e w_1200 para não subir nada gigante demais
                 const optimizedUrl = data.secure_url.replace('/upload/', '/upload/f_auto,q_auto,w_1200/');
                 onChange(optimizedUrl);
+            } else {
+                console.error('Falha no Cloudinary:', data);
+                alert(`Erro no upload: ${data.error?.message || 'Verifique sua configuração de Cloudinary (Cloud Name e Preset Unsigned)'}`);
             }
         } catch (error) {
             console.error('Erro no upload:', error);
-            alert('Falha ao subir imagem. Verifique seu Cloud Name e Preset.');
+            alert('Falha na conexão com o Cloudinary. Verifique sua rede e configurações.');
         } finally {
             setUploading(false);
         }
@@ -53,51 +56,47 @@ export default function ImageUpload({ value, onChange, label = 'Imagem' }: Image
     });
 
     return (
-        <div className="space-y-3">
-            <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest">{label}</label>
+        <div className="space-y-2">
+            <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{label}</label>
 
             {value ? (
-                <div className="relative group rounded-2xl overflow-hidden border border-white/10 bg-zinc-900 aspect-video">
-                    <img src={value} alt="Preview" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                <div className="relative group rounded-xl overflow-hidden border border-zinc-100 bg-zinc-50 aspect-video">
+                    <img src={value} alt="Preview" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                    <div className="absolute inset-0 bg-white/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
                         <button
                             type="button"
                             onClick={() => onChange('')}
-                            className="p-3 bg-red-500 rounded-full text-white hover:bg-red-600 transition-colors shadow-xl"
+                            className="p-3 bg-red-50 text-white rounded-full hover:bg-red-500 transition-colors shadow-lg active:scale-95"
                         >
-                            <X size={20} />
+                            <X size={18} />
                         </button>
-                        <div {...getRootProps()} className="p-3 bg-white rounded-full text-black hover:bg-zinc-200 transition-colors shadow-xl cursor-pointer">
-                            <Upload size={20} />
+                        <div {...getRootProps()} className="p-3 bg-black rounded-full text-white hover:bg-zinc-800 transition-colors shadow-lg cursor-pointer active:scale-95">
+                            <Upload size={18} />
                         </div>
-                    </div>
-                    <div className="absolute bottom-4 left-4 flex items-center gap-2 bg-black/80 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10">
-                        <CheckCircle2 size={14} className="text-green-500" />
-                        <span className="text-[10px] font-bold text-white uppercase tracking-wider">Upload Concluído</span>
                     </div>
                 </div>
             ) : (
                 <div
                     {...getRootProps()}
                     className={`
-            border-2 border-dashed rounded-2xl p-8 transition-all cursor-pointer aspect-video flex flex-col items-center justify-center gap-4
-            ${isDragActive ? 'border-white bg-white/5' : 'border-zinc-800 hover:border-zinc-600 bg-zinc-900/50 hover:bg-zinc-900'}
+            border-2 border-dashed rounded-xl p-8 transition-all cursor-pointer aspect-video flex flex-col items-center justify-center gap-4
+            ${isDragActive ? 'border-zinc-900 bg-zinc-50' : 'border-zinc-100 hover:border-zinc-300 bg-zinc-50/50 hover:bg-zinc-50'}
           `}
                 >
                     <input {...getInputProps()} />
                     {uploading ? (
-                        <div className="flex flex-col items-center gap-4">
-                            <Loader2 size={40} className="text-white animate-spin" />
-                            <span className="text-sm font-bold animate-pulse uppercase tracking-widest">Processando e Otimizando...</span>
+                        <div className="flex flex-col items-center gap-3">
+                            <Loader2 size={32} className="text-zinc-900 animate-spin" />
+                            <span className="text-xs font-bold text-zinc-900 uppercase tracking-widest">Processando...</span>
                         </div>
                     ) : (
                         <>
-                            <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center text-zinc-500 group-hover:text-white transition-colors">
-                                <ImageIcon size={32} />
+                            <div className="w-12 h-12 bg-white rounded-xl shadow-sm border border-zinc-100 flex items-center justify-center text-zinc-400 group-hover:text-zinc-900 transition-colors">
+                                <ImageIcon size={24} />
                             </div>
                             <div className="text-center">
-                                <p className="font-bold text-white mb-1">Arraste a imagem ou clique</p>
-                                <p className="text-xs text-zinc-500 uppercase tracking-widest leading-loose">PNG, JPG ou WEBP (Max. 10MB)</p>
+                                <p className="font-bold text-zinc-900 text-sm mb-0.5">Clique ou arraste a imagem</p>
+                                <p className="text-[10px] text-zinc-400 uppercase tracking-wider font-medium">PNG, JPG ou WEBP (Máx. 5MB)</p>
                             </div>
                         </>
                     )}

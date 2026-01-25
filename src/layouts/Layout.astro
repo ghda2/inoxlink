@@ -2,13 +2,21 @@
 import '../styles/global.css';
 import Navbar from '../components/Navbar.astro';
 import Footer from '../components/Footer.astro';
+import SEO from '../components/SEO.astro';
+import GoogleTag from '../components/GoogleTag.astro';
+import ConsentBanner from '../components/ConsentBanner.astro';
 
 interface Props {
 	title: string;
 	description?: string;
 	image?: string;
 	canonicalUrl?: string;
-	type?: string;
+	type?: 'website' | 'article' | 'profile';
+	publishedTime?: string;
+	modifiedTime?: string;
+	authorName?: string;
+	jsonLd?: object;
+	breadcrumbs?: { name: string; item: string }[];
 }
 
 const { 
@@ -16,42 +24,40 @@ const {
 	description = "Inox Link - Seu portal de notícias e wiki sobre aço inox.",
 	image,
 	canonicalUrl,
-	type = "website"
+	type = "website",
+	publishedTime,
+	modifiedTime,
+	authorName,
+	jsonLd,
+	breadcrumbs,
 } = Astro.props;
-
-const siteTitle = `${title} | Inox Link`;
 ---
 
 <!doctype html>
 <html lang="pt-br">
 	<head>
+		<GoogleTag />
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
 		
-		<!-- Primary Meta Tags -->
-		<title>{siteTitle}</title>
-		<meta name="title" content={siteTitle} />
-		<meta name="description" content={description} />
-
-		<!-- Open Graph / Facebook -->
-		<meta property="og:type" content={type} />
-		{canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
-		<meta property="og:title" content={siteTitle} />
-		<meta property="og:description" content={description} />
-		{image && <meta property="og:image" content={image} />}
-
-		<!-- Twitter -->
-		<meta property="twitter:card" content="summary_large_image" />
-		{canonicalUrl && <meta property="twitter:url" content={canonicalUrl} />}
-		<meta property="twitter:title" content={siteTitle} />
-		<meta property="twitter:description" content={description} />
-		{image && <meta property="twitter:image" content={image} />}
+		<SEO 
+			title={title}
+			description={description}
+			image={image}
+			canonicalUrl={canonicalUrl}
+			type={type}
+			publishedTime={publishedTime}
+			modifiedTime={modifiedTime}
+			authorName={authorName}
+			jsonLd={jsonLd}
+			breadcrumbs={breadcrumbs}
+		/>
 
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+		<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap">
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 		
 		<slot name="head" />
 	</head>
@@ -60,11 +66,12 @@ const siteTitle = `${title} | Inox Link`;
 		
 		<Navbar />
 
-		<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+		<main>
 			<slot />
 		</main>
 
 		<Footer />
+		<ConsentBanner />
 	</body>
 </html>
 

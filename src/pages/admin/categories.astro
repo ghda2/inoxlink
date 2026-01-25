@@ -17,26 +17,26 @@ if (Astro.request.method === 'POST') {
 ---
 
 <AdminLayout title="Categorias">
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
     <!-- List -->
-    <div class="lg:col-span-2 space-y-6">
-      <div className="bg-zinc-900/50 border border-white/5 rounded-3xl overflow-hidden backdrop-blur-sm">
+    <div class="lg:col-span-2">
+      <div class="bg-white border border-zinc-100 rounded-2xl overflow-hidden shadow-sm shadow-zinc-200/50">
         <table class="w-full text-left">
           <thead>
-            <tr class="border-b border-white/5 bg-black/40">
-              <th class="px-6 py-5 font-black text-zinc-500 text-[10px] uppercase tracking-[0.2em]">Nome</th>
-              <th class="px-6 py-5 font-black text-zinc-500 text-[10px] uppercase tracking-[0.2em] text-right">Ações</th>
+            <tr class="border-b border-zinc-100 bg-zinc-50/50">
+              <th class="px-8 py-5 font-bold text-zinc-400 text-[10px] uppercase tracking-widest leading-none">Nome</th>
+              <th class="px-8 py-5 font-bold text-zinc-400 text-[10px] uppercase tracking-widest leading-none text-right">Ações</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-white/5">
+          <tbody class="divide-y divide-zinc-50">
             {allCategories.map((cat) => (
-              <tr class="hover:bg-white/[0.02] transition-colors">
-                <td class="px-6 py-5">
-                  <span class="font-bold text-white uppercase tracking-tight">{cat.name}</span>
-                  <span class="text-[10px] text-zinc-600 block font-mono font-bold mt-1 tracking-widest">{cat.slug}</span>
+              <tr class="hover:bg-zinc-50/30 transition-colors">
+                <td class="px-8 py-5">
+                  <span class="font-bold text-zinc-900 tracking-tight">{cat.name}</span>
+                  <span class="text-[10px] text-zinc-400 block font-medium mt-0.5 italic">{cat.slug}</span>
                 </td>
-                <td class="px-6 py-4 text-right">
-                    <button class="text-xs font-black text-red-500/50 hover:text-red-500 uppercase tracking-widest transition-colors" onclick={`if(confirm('Excluir?')) window.location.href='/admin/categories/delete/${cat.id}'`}>Excluir</button>
+                <td class="px-8 py-5 text-right">
+                    <button class="text-[11px] font-bold text-red-300 hover:text-red-500 transition-colors" onclick={`if(confirm('Excluir?')) window.location.href='/admin/categories/delete/${cat.id}'`}>Excluir</button>
                 </td>
               </tr>
             ))}
@@ -47,14 +47,14 @@ if (Astro.request.method === 'POST') {
 
     <!-- Add Form -->
     <aside>
-      <div class="bg-zinc-900 border border-white/5 rounded-3xl p-8 sticky top-32 space-y-8">
-        <h3 class="text-xs font-black text-white uppercase tracking-[0.2em]">Cadastrar Nova</h3>
-        <form method="POST" class="space-y-6">
-          <div class="space-y-2">
-            <label class="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Nome da Categoria</label>
-            <input type="text" name="name" required class="w-full bg-black border border-white/5 rounded-2xl px-5 py-4 text-white focus:border-white/20 outline-none transition-all font-bold uppercase tracking-tight" />
+      <div class="bg-white border border-zinc-100 rounded-2xl p-8 sticky top-32 shadow-sm shadow-zinc-200/50">
+        <h3 class="text-sm font-bold text-zinc-900 tracking-tight mb-6">Cadastrar Nova</h3>
+        <form method="POST" class="space-y-5">
+          <div class="space-y-1.5">
+            <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Nome da Categoria</label>
+            <input type="text" name="name" required class="w-full bg-zinc-50 border border-zinc-100 rounded-xl px-4 py-3 text-zinc-900 focus:border-zinc-300 outline-none transition-all font-medium text-sm" placeholder="Ex: Manutenção" />
           </div>
-          <button type="submit" class="w-full bg-white text-black font-black text-xs uppercase tracking-[0.2em] py-5 rounded-2xl shadow-2xl hover:bg-zinc-200 transition-all active:scale-[0.98]">
+          <button type="submit" class="w-full bg-black text-white font-bold text-xs tracking-tight py-3.5 rounded-xl shadow-lg shadow-zinc-200 hover:bg-zinc-800 transition-all active:scale-[0.98]">
             Criar Categoria
           </button>
         </form>

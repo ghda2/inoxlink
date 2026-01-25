@@ -1,0 +1,77 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const title = "Termos de Uso";
+const description = "Termos e condições de uso do portal Inox Link. Conheça as regras para navegação, uso de conteúdo e responsabilidades.";
+---
+
+<Layout title={title} description={description} canonicalUrl="https://inoxlink.com.br/termos">
+    <div class="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        <div class="glass rounded-3xl p-8 md:p-12 shadow-sm border border-white/20">
+            <h1 class="text-4xl font-black tracking-tighter mb-8 bg-gradient-to-br from-black to-zinc-500 bg-clip-text text-transparent">
+                Termos de Uso
+            </h1>
+            
+            <div class="prose prose-zinc max-w-none space-y-8 text-zinc-600">
+                <section>
+                    <h2 class="text-xl font-bold text-zinc-900 mb-4">1. Aceitação dos Termos</h2>
+                    <p>
+                        Ao acessar e utilizar o portal Inox Link, você concorda em cumprir estes Termos de Uso e todas as leis e regulamentos aplicáveis. Se você não concordar com algum destes termos, está proibido de usar ou acessar este site.
+                    </p>
+                </section>
+
+                <section>
+                    <h2 class="text-xl font-bold text-zinc-900 mb-4">2. Licença de Uso</h2>
+                    <p>
+                        É concedida permissão para navegar pelo conteúdo do Inox Link para uso pessoal e informativo. Esta é a concessão de uma licença, não uma transferência de título e, sob esta licença, você não pode:
+                    </p>
+                    <ul class="list-disc pl-5 mt-2 space-y-2">
+                        <li>Modificar ou copiar os materiais para fins comerciais sem autorização prévia.</li>
+                        <li>Tentar descompilar ou fazer engenharia reversa de qualquer software contido no site.</li>
+                        <li>Remover quaisquer direitos autorais ou outras notações de propriedade dos materiais.</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2 class="text-xl font-bold text-zinc-900 mb-4">3. Precisão do Conteúdo</h2>
+                    <p>
+                        O conteúdo técnico (Wiki) e as notícias são fornecidos para fins informativos. Embora busquemos a máxima precisão técnica sobre o aço inoxidável, o Inox Link não garante que os materiais em seu site sejam precisos, completos ou atuais. O uso das informações é por sua conta e risco.
+                    </p>
+                </section>
+
+                <section>
+                    <h2 class="text-xl font-bold text-zinc-900 mb-4">4. Isenção de Responsabilidade</h2>
+                    <p>
+                        Os materiais no site do Inox Link são fornecidos 'como estão'. O Inox Link não oferece garantias, expressas ou implícitas, e, por este meio, isenta e nega todas as outras garantias, incluindo, sem limitação, garantias implícitas ou condições de comercialização ou adequação a um fim específico.
+                    </p>
+                </section>
+
+                <section>
+                    <h2 class="text-xl font-bold text-zinc-900 mb-4">5. Links de Terceiros</h2>
+                    <p>
+                        O Inox Link não analisou todos os sites vinculados ao seu site e não é responsável pelo conteúdo de nenhum site vinculado. A inclusão de qualquer link não implica endosso pelo Inox Link. O uso de qualquer site vinculado é por conta e risco do usuário.
+                    </p>
+                </section>
+
+                <section>
+                    <h2 class="text-xl font-bold text-zinc-900 mb-4">6. Modificações</h2>
+                    <p>
+                        O Inox Link pode revisar estes termos de uso do site a qualquer momento, sem aviso prévio. Ao usar este site, você concorda em ficar vinculado à versão atual desses termos de uso.
+                    </p>
+                </section>
+
+                <div class="mt-12 pt-8 border-t border-zinc-100 text-[10px] text-zinc-400 uppercase tracking-widest font-bold">
+                    Última atualização: {new Date().toLocaleDateString('pt-BR')}
+                </div>
+            </div>
+        </div>
+    </div>
+</Layout>
+
+<style>
+    .glass {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+    }
+</style>

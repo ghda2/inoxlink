@@ -1,7 +1,88 @@
 ---
+const currentYear = new Date().getFullYear();
 ---
-<footer class="mt-20 border-t border-neutral-200 bg-white/40 py-12 backdrop-blur-sm">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <p class="text-sm text-neutral-500 font-medium">© 2024 Inox Link. Todos os direitos reservados.</p>
+<footer class="mt-20 border-t border-zinc-100 bg-white/80 backdrop-blur-xl relative overflow-hidden">
+    <!-- Decorative background elements -->
+    <div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-zinc-200 to-transparent"></div>
+    
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
+            <!-- Brand Column -->
+            <div class="space-y-6">
+                <a href="/" class="flex flex-col">
+                    <span class="font-black text-2xl tracking-tighter leading-none">INOX LINK</span>
+                    <span class="text-[10px] text-zinc-500 font-bold tracking-[0.2em] mt-2 uppercase">Aço em Conexão</span>
+                </a>
+                <p class="text-sm text-zinc-500 leading-relaxed max-w-xs">
+                    Sua principal fonte de informação, notícias e conhecimento técnico sobre o universo do aço inoxidável. Do mercado às especificações técnicas.
+                </p>
+                <div class="flex items-center gap-4">
+                    <a href="#" class="p-2 rounded-full border border-zinc-100 text-zinc-400 hover:text-black hover:border-black transition-all" aria-label="LinkedIn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
+                    </a>
+                    <a href="#" class="p-2 rounded-full border border-zinc-100 text-zinc-400 hover:text-black hover:border-black transition-all" aria-label="Instagram">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div>
+                <h3 class="font-bold text-sm uppercase tracking-widest text-zinc-900 mb-6">Navegação</h3>
+                <ul class="space-y-4">
+                    <li><a href="/" class="text-sm text-zinc-500 hover:text-black transition-colors">Início</a></li>
+                    <li><a href="/noticias" class="text-sm text-zinc-500 hover:text-black transition-colors">Notícias do Setor</a></li>
+                    <li><a href="/wiki" class="text-sm text-zinc-500 hover:text-black transition-colors">Wiki Inox</a></li>
+                    <li><a href="/contato" class="text-sm text-zinc-500 hover:text-black transition-colors">Contato</a></li>
+                    <li><a href="/rss.xml" class="text-sm text-zinc-500 hover:text-black transition-colors">RSS Feed</a></li>
+                </ul>
+            </div>
+
+            <!-- Knowledge -->
+            <div>
+                <h3 class="font-bold text-sm uppercase tracking-widest text-zinc-900 mb-6">Conhecimento</h3>
+                <ul class="space-y-4">
+                    <li><a href="/wiki" class="text-sm text-zinc-500 hover:text-black transition-colors">Tipos de Aço</a></li>
+                    <li><a href="/wiki" class="text-sm text-zinc-500 hover:text-black transition-colors">Aplicações Industriais</a></li>
+                    <li><a href="/wiki" class="text-sm text-zinc-500 hover:text-black transition-colors">Tabelas Técnicas</a></li>
+                    <li><a href="/wiki" class="text-sm text-zinc-500 hover:text-black transition-colors">Guia de Manutenção</a></li>
+                </ul>
+            </div>
+
+            <!-- Newsletter Area -->
+            <div>
+                <h3 class="font-bold text-sm uppercase tracking-widest text-zinc-900 mb-6">Newsletter</h3>
+                <p class="text-xs text-zinc-500 mb-4 leading-relaxed">
+                    Assine para receber as últimas notícias do mercado e atualizações técnicas diretamente no seu e-mail.
+                </p>
+                <form class="space-y-2" aria-label="Assinar newsletter">
+                    <div class="relative group">
+                        <input 
+                            type="email" 
+                            placeholder="Seu melhor e-mail" 
+                            aria-label="Seu e-mail para newsletter"
+                            required
+                            class="w-full bg-zinc-50 border border-zinc-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-black transition-all outline-none"
+                        />
+                        <button type="submit" aria-label="Enviar inscrição" class="absolute right-2 top-2 bottom-2 bg-black text-white px-3 rounded-lg hover:bg-zinc-800 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Bottom Bar -->
+        <div class="mt-16 pt-8 border-t border-zinc-100 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
+                <p class="text-[11px] font-medium text-zinc-500 uppercase tracking-widest">
+                    © {currentYear} Inox Link. Todos os direitos reservados.
+                </p>
+            </div>
+            <div class="flex items-center gap-8">
+                <a href="/privacidade" class="text-[11px] font-bold text-zinc-500 hover:text-black transition-colors uppercase tracking-widest">Privacidade</a>
+                <a href="/termos" class="text-[11px] font-bold text-zinc-500 hover:text-black transition-colors uppercase tracking-widest">Termos</a>
+            </div>
+        </div>
     </div>
 </footer>

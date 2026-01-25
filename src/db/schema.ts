@@ -74,6 +74,8 @@ export const wiki = pgTable("wiki", {
     title: varchar({ length: 255 }).notNull(),
     slug: varchar({ length: 255 }).notNull(),
     content: text().notNull(),
+    imageUrl: varchar("image_url", { length: 500 }),
+    categoryId: integer("category_id"),
     authorId: integer("author_id"),
     metaTitle: varchar("meta_title", { length: 255 }),
     metaDescription: text("meta_description"),
@@ -83,6 +85,11 @@ export const wiki = pgTable("wiki", {
     createdAt: timestamp("created_at", { mode: 'string' }).defaultNow(),
     updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow(),
 }, (table) => [
+    foreignKey({
+        columns: [table.categoryId],
+        foreignColumns: [categories.id],
+        name: "wiki_category_id_fkey"
+    }).onDelete("set null"),
     foreignKey({
         columns: [table.authorId],
         foreignColumns: [authors.id],

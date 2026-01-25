@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import { actions } from 'astro:actions';
 import Editor from './Editor';
-import { Save, Loader2, FileText, ArrowLeft } from 'lucide-react';
+import SEOAnalyzer from './SEOAnalyzer';
+import { aiService } from '../../services/ai';
+import { Save, Loader2, FileText, ArrowLeft, Search, Sparkles } from 'lucide-react';
+
+
 
 interface WikiFormProps {
     initialData?: any;
@@ -10,12 +14,19 @@ interface WikiFormProps {
 
 export default function WikiForm({ initialData, authors }: WikiFormProps) {
     const [loading, setLoading] = useState(false);
+    const [aiSuggesting, setAiSuggesting] = useState(false);
+
     const [formData, setFormData] = useState({
         title: initialData?.title || '',
         slug: initialData?.slug || '',
         content: initialData?.content || '',
         authorId: initialData?.authorId || (authors[0]?.id || null),
+        categoryId: initialData?.categoryId || null,
+        metaTitle: initialData?.metaTitle || '',
+        metaDescription: initialData?.metaDescription || '',
+        tags: initialData?.tags || '', // Using tags field as keywords fallback or just tags
     });
+
 
     const generateSlug = (title: string) => {
         return title.toLowerCase()
@@ -52,6 +63,29 @@ export default function WikiForm({ initialData, authors }: WikiFormProps) {
             setLoading(false);
         }
     };
+
+    const handleAiSuggest = async () => {
+        if (!formData.content || formData.content.length < 50) {
+            alert('Escreva um pouco mais de conteúdo para que a IA possa analisar.');
+            return;
+        }
+
+        setAiSuggesting(true);
+        try {
+            const suggestion = await aiService.suggestMetadata(formData.content, formData.title);
+            setFormData(prev => ({
+                ...prev,
+                metaTitle: suggestion.title,
+                metaDescription: suggestion.description,
+                tags: suggestion.keywords
+            }));
+        } catch (err) {
+            alert('Falha ao obter sugestão da IA.');
+        } finally {
+            setAiSuggesting(false);
+        }
+    };
+
 
     return (
         <form onSubmit={handleSubmit} className="flex flex-col xl:flex-row gap-12">
@@ -111,6 +145,57 @@ export default function WikiForm({ initialData, authors }: WikiFormProps) {
                             >
                                 {authors.map(a => <option key={a.id} value={a.id}>{a.name.toUpperCase()}</option>)}
                             </select>
+                        </div>
+
+                        <div className="space-y-4 border-t border-white/5 pt-6">
+                            <div className="flex items-center justify-between">
+                                <h4 className="text-[10px] font-black text-white uppercase tracking-[0.2em] flex items-center gap-3">
+                                    <Search size={16} className="text-zinc-500" /> SEO
+                                </h4>
+                                <button
+                                    type="button"
+                                    onClick={handleAiSuggest}
+                                    disabled={aiSuggesting}
+                                    className="flex items-center gap-1.5 px-2 py-1 bg-emerald-500/10 text-emerald-400 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-emerald-500/20 transition-colors disabled:opacity-50"
+                                >
+                                    {aiSuggesting ? <Loader2 size={10} className="animate-spin" /> : <Sparkles size={10} />}
+                                    Auto IA
+                                </button>
+                            </div>
+
+
+                            <div className="space-y-4">
+                                <div className="space-y-1.5">
+                                    <label className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Título SEO</label>
+                                    <input
+                                        type="text"
+                                        value={formData.metaTitle}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, metaTitle: e.target.value }))}
+                                        placeholder={formData.title}
+                                        className="w-full bg-black border border-white/5 rounded-xl px-4 py-3 text-xs text-white focus:border-white/20 outline-none"
+                                    />
+                                </div>
+
+                                <div className="space-y-1.5">
+                                    <label className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Meta Descrição</label>
+                                    <textarea
+                                        value={formData.metaDescription}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, metaDescription: e.target.value }))}
+                                        rows={3}
+                                        className="w-full bg-black border border-white/5 rounded-xl px-4 py-3 text-xs text-zinc-300 focus:border-white/20 outline-none resize-none"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="text-zinc-900">
+                            <SEOAnalyzer
+                                content={formData.content}
+                                title={formData.metaTitle || formData.title}
+                                description={formData.metaDescription}
+                                focusKeyword={(formData.tags as any) || ''}
+                                onKeywordChange={(val) => setFormData(prev => ({ ...prev, tags: val }))}
+                            />
                         </div>
                     </div>
 

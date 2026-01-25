@@ -1,0 +1,79 @@
+---
+---
+<div id="consent-banner" class="fixed bottom-0 left-0 right-0 z-[200] p-4 lg:p-8 translate-y-full transition-transform duration-500 ease-out hidden">
+    <div class="max-w-4xl mx-auto glass rounded-2xl p-6 lg:p-8 flex flex-col md:flex-row items-center justify-between gap-6 border border-white/20 shadow-2xl">
+        <div class="flex-1">
+            <h3 class="text-xl font-bold mb-2">Sua privacidade é importante</h3>
+            <p class="text-zinc-600 text-sm leading-relaxed">
+                Utilizamos cookies e tecnologias semelhantes para melhorar sua cada experiência no Inox Link, analisar o tráfego do site e personalizar anúncios. Ao clicar em "Aceitar todos", você concorda com o uso de todas as categorias de cookies.
+            </p>
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+            <button id="deny-consent" class="px-6 py-2.5 rounded-xl border border-zinc-200 text-zinc-600 font-semibold text-sm hover:bg-zinc-50 transition-colors">
+                Recusar
+            </button>
+            <button id="accept-consent" class="px-6 py-2.5 rounded-xl bg-black text-white font-semibold text-sm hover:bg-zinc-800 transition-all shadow-lg hover:shadow-black/20">
+                Aceitar todos
+            </button>
+        </div>
+    </div>
+</div>
+
+<script is:inline>
+    const STORAGE_KEY = 'inoxlink-consent';
+
+    function updateConsent(status) {
+        const consentData = {
+            'ad_storage': status,
+            'ad_user_data': status,
+            'ad_personalization': status,
+            'analytics_storage': status
+        };
+
+        // Update Google Tag
+        if (typeof gtag === 'function') {
+            gtag('consent', 'update', consentData);
+        }
+
+        // Save preference
+        localStorage.setItem(STORAGE_KEY, status);
+
+        // Hide banner
+        const banner = document.getElementById('consent-banner');
+        if (banner) {
+            banner.classList.add('translate-y-full');
+            setTimeout(() => banner.classList.add('hidden'), 500);
+        }
+    }
+
+    // Check for existing preference
+    const savedConsent = localStorage.getItem(STORAGE_KEY);
+    const banner = document.getElementById('consent-banner');
+
+    if (!savedConsent && banner) {
+        banner.classList.remove('hidden');
+        setTimeout(() => banner.classList.remove('translate-y-full'), 100);
+    } else if (savedConsent === 'granted') {
+        // Apply existing consent
+        if (typeof gtag === 'function') {
+            gtag('consent', 'update', {
+                'ad_storage': 'granted',
+                'ad_user_data': 'granted',
+                'ad_personalization': 'granted',
+                'analytics_storage': 'granted'
+            });
+        }
+    }
+
+    // Event listeners
+    document.getElementById('accept-consent')?.addEventListener('click', () => updateConsent('granted'));
+    document.getElementById('deny-consent')?.addEventListener('click', () => updateConsent('denied'));
+</script>
+
+<style>
+    .glass {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+    }
+</style>

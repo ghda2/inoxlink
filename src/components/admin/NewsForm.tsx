@@ -2,7 +2,11 @@ import React, { useState } from 'react';
 import { actions } from 'astro:actions';
 import Editor from './Editor';
 import ImageUpload from './ImageUpload';
-import { Save, Loader2, Globe, FileText, Layout, Eye, ArrowLeft } from 'lucide-react';
+import SEOAnalyzer from './SEOAnalyzer';
+import { aiService } from '../../services/ai';
+import { Save, Loader2, Globe, FileText, Layout, Eye, ArrowLeft, Search, Sparkles } from 'lucide-react';
+
+
 import { cn } from '../../scripts/utils';
 
 interface NewsFormProps {
@@ -13,7 +17,9 @@ interface NewsFormProps {
 
 export default function NewsForm({ initialData, categories, authors }: NewsFormProps) {
     const [loading, setLoading] = useState(false);
+    const [aiSuggesting, setAiSuggesting] = useState(false);
     const [formData, setFormData] = useState({
+
         title: initialData?.title || '',
         slug: initialData?.slug || '',
         content: initialData?.content || '',
@@ -22,7 +28,11 @@ export default function NewsForm({ initialData, categories, authors }: NewsFormP
         categoryId: initialData?.categoryId || (categories[0]?.id || null),
         authorId: initialData?.authorId || (authors[0]?.id || null),
         published: initialData?.published || false,
+        metaTitle: initialData?.metaTitle || '',
+        metaDescription: initialData?.metaDescription || '',
+        keywords: initialData?.keywords || '',
     });
+
 
     const generateSlug = (title: string) => {
         return title.toLowerCase()
@@ -67,143 +77,226 @@ export default function NewsForm({ initialData, categories, authors }: NewsFormP
         }
     };
 
+    const handleAiSuggest = async () => {
+        if (!formData.content || formData.content.length < 50) {
+            alert('Escreva um pouco mais de conteúdo para que a IA possa analisar.');
+            return;
+        }
+
+        setAiSuggesting(true);
+        try {
+            const suggestion = await aiService.suggestMetadata(formData.content, formData.title);
+            setFormData(prev => ({
+                ...prev,
+                metaTitle: suggestion.title,
+                metaDescription: suggestion.description,
+                keywords: suggestion.keywords
+            }));
+        } catch (err) {
+            alert('Falha ao obter sugestão da IA.');
+        } finally {
+            setAiSuggesting(false);
+        }
+    };
+
+
     return (
-        <form onSubmit={handleSubmit} className="flex flex-col xl:flex-row gap-12">
-            <div className="flex-1 space-y-12">
-                <header className="flex items-center gap-4 text-zinc-500 mb-4">
-                    <a href="/admin/news" className="hover:text-white transition-colors flex items-center gap-2 text-sm font-bold uppercase tracking-widest">
-                        <ArrowLeft size={16} /> Voltar
-                    </a>
-                    <span className="text-zinc-800">|</span>
-                    <span className="text-xs font-bold uppercase tracking-widest">{initialData?.id ? 'Editar Matéria' : 'Novo Rascunho'}</span>
-                </header>
+        <form onSubmit={handleSubmit} className="flex flex-col lg:flex-row min-h-screen bg-[#fcfcfc]">
+            {/* Main Canvas */}
+            <div className="flex-1 flex justify-center py-12 px-6 lg:px-12 bg-white min-h-screen border-r border-zinc-100 shadow-sm">
+                <div className="w-full max-w-[800px] space-y-10">
+                    <header className="flex items-center gap-3 text-zinc-400 mb-8">
+                        <a href="/admin/news" className="hover:text-black transition-colors flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider">
+                            <ArrowLeft size={14} /> Painel
+                        </a>
+                        <span className="text-zinc-200">/</span>
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-400">{initialData?.id ? 'Editar' : 'Escrever'}</span>
+                    </header>
 
-                <section className="space-y-4">
-                    <input
-                        type="text"
-                        value={formData.title}
-                        onChange={handleTitleChange}
-                        required
-                        placeholder="TÍTULO DA MATÉRIA..."
-                        className="w-full bg-transparent border-none text-4xl lg:text-6xl font-black italic tracking-tighter placeholder:text-zinc-900 focus:outline-none focus:ring-0 uppercase p-0"
-                    />
-                    <div className="h-2 w-32 bg-white"></div>
-                </section>
+                    <section className="space-y-6">
+                        <input
+                            type="text"
+                            value={formData.title}
+                            onChange={handleTitleChange}
+                            required
+                            placeholder="Adicione um título"
+                            className="w-full bg-transparent border-none text-5xl lg:text-6xl font-bold tracking-tight text-zinc-900 placeholder:text-zinc-100 focus:outline-none focus:ring-0 p-0 leading-tight"
+                        />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="space-y-3">
-                        <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Resumo Manual</label>
-                        <textarea
-                            value={formData.excerpt}
-                            onChange={(e) => setFormData(prev => ({ ...prev, excerpt: e.target.value }))}
-                            rows={4}
-                            placeholder="Escreva um breve resumo atrativo..."
-                            className="w-full bg-zinc-900 border-none rounded-2xl p-5 text-white focus:ring-2 focus:ring-white/20 transition-all placeholder:text-zinc-700"
+                        <div className="flex gap-6 border-b border-zinc-50 pb-8">
+                            <div className="flex-1">
+                                <label className="text-[10px] font-bold text-zinc-300 uppercase tracking-widest mb-2 block">Resumo do post</label>
+                                <textarea
+                                    value={formData.excerpt}
+                                    onChange={(e) => setFormData(prev => ({ ...prev, excerpt: e.target.value }))}
+                                    rows={2}
+                                    placeholder="Uma breve introdução..."
+                                    className="w-full bg-transparent border-none p-0 text-zinc-500 placeholder:text-zinc-200 focus:ring-0 outline-none text-lg leading-relaxed resize-none font-light italic"
+                                />
+                            </div>
+                        </div>
+                    </section>
+
+                    <div className="pb-32">
+                        <Editor
+                            content={formData.content}
+                            onChange={(content) => setFormData(prev => ({ ...prev, content }))}
                         />
                     </div>
-
-                    <ImageUpload
-                        label="Capa da Matéria"
-                        value={formData.imageUrl}
-                        onChange={(url) => setFormData(prev => ({ ...prev, imageUrl: url }))}
-                    />
-                </div>
-
-                <div className="space-y-3">
-                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Corpo do Conteúdo</label>
-                    <Editor
-                        content={formData.content}
-                        onChange={(content) => setFormData(prev => ({ ...prev, content }))}
-                    />
                 </div>
             </div>
 
-            <aside className="w-full xl:w-96 space-y-8">
-                <div className="bg-zinc-900/50 border border-white/5 rounded-3xl p-8 sticky top-32 space-y-8 backdrop-blur-xl">
-                    <div className="space-y-6">
-                        <h3 className="text-xs font-black text-white uppercase tracking-[0.2em] flex items-center gap-3">
-                            <Globe size={16} /> Publicação
-                        </h3>
-
-                        <div className="flex bg-black p-1.5 rounded-2xl border border-white/5">
+            {/* Gutenberg Sidebar */}
+            <aside className="w-full lg:w-80 bg-[#fcfcfc] sticky top-0 h-screen overflow-y-auto p-0 border-l border-zinc-100">
+                <div className="p-6 space-y-8">
+                    <div className="flex items-center justify-between pb-4 border-b border-zinc-100">
+                        <h3 className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Configurações</h3>
+                        <div className="flex gap-2">
                             <button
-                                type="button"
-                                onClick={() => setFormData(prev => ({ ...prev, published: false }))}
-                                className={cn(
-                                    "flex-1 py-3 px-4 rounded-xl text-xs font-black tracking-widest uppercase transition-all",
-                                    !formData.published ? "bg-zinc-800 text-white shadow-xl" : "text-zinc-600 hover:text-zinc-400"
-                                )}
+                                type="submit"
+                                disabled={loading}
+                                className="px-4 py-2 bg-black text-white text-[10px] font-bold uppercase tracking-wider rounded-lg shadow-lg hover:bg-zinc-800 transition-all flex items-center gap-2"
                             >
-                                Rascunho
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setFormData(prev => ({ ...prev, published: true }))}
-                                className={cn(
-                                    "flex-1 py-3 px-4 rounded-xl text-xs font-black tracking-widest uppercase transition-all",
-                                    formData.published ? "bg-white text-black shadow-xl" : "text-zinc-600 hover:text-zinc-400"
-                                )}
-                            >
-                                Público
+                                {loading ? <Loader2 className="animate-spin" size={12} /> : <Save size={12} />}
+                                {initialData?.id ? 'Atualizar' : 'Publicar'}
                             </button>
                         </div>
+                    </div>
 
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">URL Slug</label>
-                            <input
-                                type="text"
-                                value={formData.slug}
-                                onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
-                                className="w-full bg-black border border-white/5 rounded-xl px-4 py-3 text-xs font-mono text-white focus:border-white/20 outline-none"
+                    <div className="space-y-6">
+                        <section className="space-y-4">
+                            <h4 className="text-[11px] font-bold text-zinc-900 uppercase tracking-wider flex items-center gap-2">
+                                <Globe size={14} className="text-zinc-400" /> Visibilidade
+                            </h4>
+
+                            <div className="flex bg-zinc-100 p-1 rounded-xl">
+                                <button
+                                    type="button"
+                                    onClick={() => setFormData(prev => ({ ...prev, published: false }))}
+                                    className={cn(
+                                        "flex-1 py-2 rounded-lg text-[10px] font-bold uppercase transition-all",
+                                        !formData.published ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-400"
+                                    )}
+                                >
+                                    Rascunho
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setFormData(prev => ({ ...prev, published: true }))}
+                                    className={cn(
+                                        "flex-1 py-2 rounded-lg text-[10px] font-bold uppercase transition-all",
+                                        formData.published ? "bg-black text-white shadow-sm" : "text-zinc-400"
+                                    )}
+                                >
+                                    Público
+                                </button>
+                            </div>
+                        </section>
+
+                        <section className="space-y-4">
+                            <h4 className="text-[11px] font-bold text-zinc-900 uppercase tracking-wider flex items-center gap-2">
+                                <Layout size={14} className="text-zinc-400" /> Taxonomia
+                            </h4>
+
+                            <div className="space-y-4">
+                                <div className="space-y-1.5">
+                                    <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Categoria</label>
+                                    <select
+                                        value={formData.categoryId || ''}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, categoryId: Number(e.target.value) }))}
+                                        className="w-full bg-white border border-zinc-200 rounded-lg px-3 py-2 text-xs font-bold text-zinc-900 outline-none"
+                                    >
+                                        {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                                    </select>
+                                </div>
+
+                                <div className="space-y-1.5">
+                                    <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Autor</label>
+                                    <select
+                                        value={formData.authorId || ''}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, authorId: Number(e.target.value) }))}
+                                        className="w-full bg-white border border-zinc-200 rounded-lg px-3 py-2 text-xs font-bold text-zinc-900 outline-none"
+                                    >
+                                        {authors.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+                                    </select>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section className="space-y-4">
+                            <ImageUpload
+                                label="Imagem de Destaque"
+                                value={formData.imageUrl}
+                                onChange={(url) => setFormData(prev => ({ ...prev, imageUrl: url }))}
                             />
-                        </div>
+                        </section>
+
+                        <section className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <h4 className="text-[11px] font-bold text-zinc-900 uppercase tracking-wider flex items-center gap-2">
+                                    <Search size={14} className="text-zinc-400" /> Metadados SEO
+                                </h4>
+                                <button
+                                    type="button"
+                                    onClick={handleAiSuggest}
+                                    disabled={aiSuggesting}
+                                    className="flex items-center gap-1.5 px-2 py-1 bg-emerald-50 text-emerald-700 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-emerald-100 transition-colors disabled:opacity-50"
+                                >
+                                    {aiSuggesting ? <Loader2 size={10} className="animate-spin" /> : <Sparkles size={10} />}
+                                    Sugerir com IA
+                                </button>
+                            </div>
+
+
+                            <div className="space-y-4">
+                                <div className="space-y-1.5">
+                                    <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Título SEO (Opcional)</label>
+                                    <input
+                                        type="text"
+                                        value={formData.metaTitle}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, metaTitle: e.target.value }))}
+                                        placeholder={formData.title}
+                                        className="w-full bg-white border border-zinc-200 rounded-lg px-3 py-2 text-xs font-bold text-zinc-900 outline-none"
+                                    />
+                                </div>
+
+                                <div className="space-y-1.5">
+                                    <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Meta Descrição</label>
+                                    <textarea
+                                        value={formData.metaDescription}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, metaDescription: e.target.value }))}
+                                        rows={3}
+                                        className="w-full bg-white border border-zinc-200 rounded-lg px-3 py-2 text-xs font-medium text-zinc-600 outline-none resize-none"
+                                    />
+                                </div>
+                            </div>
+                        </section>
+
+                        <SEOAnalyzer
+                            content={formData.content}
+                            title={formData.metaTitle || formData.title}
+                            description={formData.metaDescription || formData.excerpt}
+                            focusKeyword={formData.keywords}
+                            onKeywordChange={(val) => setFormData(prev => ({ ...prev, keywords: val }))}
+                        />
+
+                        <section className="space-y-2">
+                            <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Link Permanente</label>
+                            <div className="bg-zinc-100 rounded-lg px-3 py-2 text-[10px] font-mono text-zinc-500 break-all">
+                                inoxlink.com.br/news/{formData.slug}
+                            </div>
+                        </section>
                     </div>
 
-                    <div className="h-px bg-white/5"></div>
 
-                    <div className="space-y-6">
-                        <h3 className="text-xs font-black text-white uppercase tracking-[0.2em] flex items-center gap-3">
-                            <Layout size={16} /> Estrutura
-                        </h3>
 
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Categoria</label>
-                            <select
-                                value={formData.categoryId || ''}
-                                onChange={(e) => setFormData(prev => ({ ...prev, categoryId: Number(e.target.value) }))}
-                                className="w-full bg-black border border-white/5 rounded-xl px-4 py-3 text-xs font-bold text-white outline-none appearance-none"
-                            >
-                                {categories.map(c => <option key={c.id} value={c.id}>{c.name.toUpperCase()}</option>)}
-                            </select>
-                        </div>
-
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Autor Responsável</label>
-                            <select
-                                value={formData.authorId || ''}
-                                onChange={(e) => setFormData(prev => ({ ...prev, authorId: Number(e.target.value) }))}
-                                className="w-full bg-black border border-white/5 rounded-xl px-4 py-3 text-xs font-bold text-white outline-none appearance-none"
-                            >
-                                {authors.map(a => <option key={a.id} value={a.id}>{a.name.toUpperCase()}</option>)}
-                            </select>
-                        </div>
-                    </div>
-
-                    <div className="pt-4 flex flex-col gap-3">
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="w-full py-5 bg-white hover:bg-zinc-200 disabled:bg-zinc-800 disabled:text-zinc-500 text-black rounded-2xl font-black text-sm uppercase tracking-widest transition-all shadow-2xl flex items-center justify-center gap-3 active:scale-[0.98]"
-                        >
-                            {loading ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
-                            {initialData?.id ? 'Atualizar Dados' : 'Finalizar Artigo'}
-                        </button>
-                        <button type="button" className="w-full py-4 border border-white/10 hover:bg-white/5 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2">
-                            <Eye size={14} /> Pré-visualizar
+                    <div className="pt-8 flex flex-col gap-3">
+                        <button type="button" className="w-full py-3 border border-zinc-200 hover:bg-zinc-50 text-zinc-400 rounded-xl font-bold text-[10px] uppercase tracking-wider transition-all flex items-center justify-center gap-2">
+                            <Eye size={14} /> Visualizar Prévia
                         </button>
                     </div>
                 </div>
             </aside>
-        </form>
+        </form >
     );
 }

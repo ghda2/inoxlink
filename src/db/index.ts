@@ -6,14 +6,12 @@ import * as relations from './relations';
 const databaseUrl = process.env?.DATABASE_URL || import.meta.env?.DATABASE_URL;
 
 if (!databaseUrl) {
-    console.error('❌ ERRO CRÍTICO: DATABASE_URL não encontrada no ambiente!');
-    if (typeof import.meta !== 'undefined' && import.meta.env?.PROD) {
-        // Em produção, vamos apenas logar e deixar o erro estourar ao tentar conectar
-        console.error('Certifique-se de que a variável DATABASE_URL está definida no PM2 ou no arquivo .env');
-    }
+    console.warn('⚠️ DATABASE_URL não encontrada no ambiente.');
 }
 
-const sql = neon(databaseUrl || '');
+// Inicializa com string vazia apenas se não houver URL, 
+// mas embrulha para evitar erro imediato no build se não for usado.
+const sql = neon(databaseUrl || 'postgresql://placeholder:placeholder@localhost:5432/placeholder');
 export const db = drizzle(sql, {
     schema: { ...schema, ...relations }
 });

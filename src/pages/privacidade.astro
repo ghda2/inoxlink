@@ -1,0 +1,82 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const title = "Política de Privacidade";
+const description = "Saiba como o Inox Link coleta, utiliza e protege suas informações pessoais de acordo com a LGPD e o Consent Mode v2.";
+---
+
+<Layout title={title} description={description} canonicalUrl="https://inoxlink.com.br/privacidade">
+    <div class="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        <div class="glass rounded-3xl p-8 md:p-12 shadow-sm border border-white/20">
+            <h1 class="text-4xl font-black tracking-tighter mb-8 bg-gradient-to-br from-black to-zinc-500 bg-clip-text text-transparent">
+                Política de Privacidade
+            </h1>
+            
+            <div class="prose prose-zinc max-w-none space-y-8 text-zinc-600">
+                <section>
+                    <h2 class="text-xl font-bold text-zinc-900 mb-4">1. Introdução</h2>
+                    <p>
+                        O Inox Link está comprometido com a proteção de sua privacidade. Esta Política de Privacidade explica como coletamos, usamos e protegemos suas informações pessoais ao utilizar nosso portal.
+                    </p>
+                </section>
+
+                <section>
+                    <h2 class="text-xl font-bold text-zinc-900 mb-4">2. Coleta de Dados e Consentimento</h2>
+                    <p>
+                        Em conformidade com o Google Consent Mode v2 e a LGPD, coletamos dados apenas mediante seu consentimento explícito por meio de nosso banner de privacidade. Os dados podem incluir:
+                    </p>
+                    <ul class="list-disc pl-5 mt-2 space-y-2">
+                        <li>Identificadores de cookies e dados de navegação (Google Analytics).</li>
+                        <li>Dados de interação com anúncios (Google Ads).</li>
+                        <li>Endereço de e-mail (apenas se fornecido voluntariamente na Newsletter).</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2 class="text-xl font-bold text-zinc-900 mb-4">3. Finalidade do Tratamento</h2>
+                    <p>
+                        Utilizamos seus dados para:
+                    </p>
+                    <ul class="list-disc pl-5 mt-2 space-y-2">
+                        <li>Melhorar a experiência de navegação e conteúdo do site.</li>
+                        <li>Analisar o tráfego e performance do portal.</li>
+                        <li>Enviar notícias e atualizações técnicas via Newsletter (quando solicitado).</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2 class="text-xl font-bold text-zinc-900 mb-4">4. Proteção de Dados</h2>
+                    <p>
+                        Implementamos medidas técnicas e organizacionais adequadas para proteger seus dados contra acesso não autorizado, perda ou alteração. Não vendemos seus dados a terceiros.
+                    </p>
+                </section>
+
+                <section>
+                    <h2 class="text-xl font-bold text-zinc-900 mb-4">5. Seus Direitos</h2>
+                    <p>
+                        Você tem o direito de acessar, corrigir ou excluir seus dados pessoais, bem como revogar seu consentimento a qualquer momento através das configurações do seu navegador ou limpando o armazenamento local do site.
+                    </p>
+                </section>
+
+                <section>
+                    <h2 class="text-xl font-bold text-zinc-900 mb-4">6. Contato</h2>
+                    <p>
+                        Para questões relacionadas a esta política, entre em contato através da nossa área administrativa ou canais oficiais.
+                    </p>
+                </section>
+
+                <div class="mt-12 pt-8 border-t border-zinc-100 text-[10px] text-zinc-400 uppercase tracking-widest font-bold">
+                    Última atualização: {new Date().toLocaleDateString('pt-BR')}
+                </div>
+            </div>
+        </div>
+    </div>
+</Layout>
+
+<style>
+    .glass {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+    }
+</style>

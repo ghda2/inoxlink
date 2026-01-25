@@ -1,39 +1,157 @@
 ---
 import AdminLayout from '../../layouts/AdminLayout.astro';
 import { db } from '../../db';
-import { wiki } from '../../db/schema';
-import { desc } from 'drizzle-orm';
+import { wiki, categories } from '../../db/schema';
+import { desc, eq } from 'drizzle-orm';
 
-const allWiki = await db.select().from(wiki).orderBy(desc(wiki.createdAt));
+const allWiki = await db.select({
+    id: wiki.id,
+    title: wiki.title,
+    slug: wiki.slug,
+    imageUrl: wiki.imageUrl,
+    categoryId: wiki.categoryId,
+    categoryName: categories.name,
+    createdAt: wiki.createdAt,
+})
+.from(wiki)
+.leftJoin(categories, eq(wiki.categoryId, categories.id))
+.orderBy(desc(wiki.createdAt));
 ---
 
-<AdminLayout title="Wiki Técnica">
+<AdminLayout title="Wiki">
   <div slot="header-actions">
-    <a href="/admin/wiki/new" class="px-8 py-4 bg-white text-black rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-2xl hover:bg-zinc-200 transition-all active:scale-[0.98]">
-      + Novo Artigo
+    <a href="/admin/wiki/new" class="px-6 py-3 bg-black text-white rounded-xl font-bold text-xs tracking-tight shadow-lg shadow-zinc-200 hover:bg-zinc-800 transition-all active:scale-[0.98]">
+      + Criar Novo
     </a>
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-    {allWiki.map((item) => (
-      <a href={`/admin/wiki/${item.id}`} class="group bg-zinc-900 border border-white/5 p-8 rounded-3xl hover:border-white/20 transition-all">
-        <div class="flex flex-col h-full">
-            <span class="text-[10px] text-zinc-600 font-bold uppercase tracking-[0.2em] mb-4">Artigo Wiki</span>
-            <h3 class="text-2xl font-black text-white uppercase italic tracking-tighter leading-tight group-hover:text-white transition-colors mb-4">{item.title}</h3>
-            <div class="h-0.5 w-12 bg-white/10 group-hover:w-full group-hover:bg-white transition-all duration-500 mb-6"></div>
-            <div class="mt-auto flex items-center justify-between">
-                <span class="text-[10px] font-bold text-zinc-500 font-mono tracking-widest block uppercase">/{item.slug}</span>
-                <span class="text-[10px] font-black text-zinc-800 uppercase tracking-widest group-hover:text-white transition-colors">Editar →</span>
-            </div>
-        </div>
-      </a>
-    ))}
+  <div class="bg-white border border-zinc-100 rounded-2xl overflow-hidden shadow-sm">
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead>
+          <tr class="border-b border-zinc-100 bg-zinc-50">
+            <th class="text-left py-4 px-6 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Artigo</th>
+            <th class="text-left py-4 px-6 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Categoria</th>
+            <th class="text-left py-4 px-6 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Criado</th>
+            <th class="text-right py-4 px-6 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Ações</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-zinc-50">
+          {allWiki.map((item) => (
+            <tr class="hover:bg-zinc-50 transition-colors">
+              <td class="py-4 px-6">
+                <div class="flex items-center gap-3">
+                  {item.imageUrl ? (
+                    <img src={item.imageUrl} alt={item.title} class="w-12 h-12 rounded-lg object-cover bg-zinc-100" />
+                  ) : (
+                    <div class="w-12 h-12 rounded-lg bg-zinc-100 flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-400">
+                        <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
+                      </svg>
+                    </div>
+                  )}
+                  <div class="min-w-0 flex-1">
+                    <p class="text-sm font-bold text-zinc-900 truncate">{item.title}</p>
+                    <p class="text-xs text-zinc-500 truncate">/wiki/{item.slug}</p>
+                  </div>
+                </div>
+              </td>
+              <td class="py-4 px-6">
+                {item.categoryName ? (
+                  <span class="inline-block px-2.5 py-1 bg-emerald-50 text-emerald-700 text-xs font-medium rounded-lg border border-emerald-100">
+                    {item.categoryName}
+                  </span>
+                ) : (
+                  <span class="text-xs text-zinc-400">Sem categoria</span>
+                )}
+              </td>
+              <td class="py-4 px-6">
+                <p class="text-sm text-zinc-900">{new Date(item.createdAt || '').toLocaleDateString('pt-BR')}</p>
+                <p class="text-xs text-zinc-500">{new Date(item.createdAt || '').toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</p>
+              </td>
+              <td class="py-4 px-6">
+                <div class="flex items-center justify-end gap-2">
+                  <a 
+                    href={`/wiki/${item.slug}`}
+                    target="_blank"
+                    class="p-2 text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 rounded-lg transition-all"
+                    title="Visualizar"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+                      <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  </a>
+                  <a 
+                    href={`/admin/wiki/${item.id}`}
+                    class="p-2 text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 rounded-lg transition-all"
+                    title="Editar"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
+                      <path d="m15 5 4 4"/>
+                    </svg>
+                  </a>
+                  <button
+                    class="p-2 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all delete-wiki"
+                    data-id={item.id}
+                    data-title={item.title}
+                    title="Excluir"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M3 6h18"/>
+                      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
 
     {allWiki.length === 0 && (
-        <div class="col-span-full border-2 border-dashed border-zinc-900 rounded-[3rem] py-24 flex flex-col items-center justify-center text-center">
-            <h2 class="text-zinc-800 text-4xl font-black italic uppercase tracking-tighter mb-4">Wiki Vazia</h2>
-            <p class="text-zinc-600 text-xs font-bold uppercase tracking-[0.2em]">Comece a documentar seus processos</p>
+      <div class="py-20 text-center">
+        <div class="inline-flex w-16 h-16 bg-zinc-100 rounded-full items-center justify-center mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-400">
+            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
+          </svg>
         </div>
+        <p class="text-zinc-400 font-medium mb-4">Nenhum artigo criado ainda</p>
+        <a 
+          href="/admin/wiki/new" 
+          class="inline-flex items-center gap-2 px-4 py-2 bg-black text-white text-sm font-bold rounded-lg hover:bg-zinc-800 transition-all"
+        >
+          Criar primeiro artigo
+        </a>
+      </div>
     )}
   </div>
 </AdminLayout>
+
+<script>
+  import { actions } from 'astro:actions';
+
+  document.querySelectorAll('.delete-wiki').forEach(button => {
+    button.addEventListener('click', async () => {
+      const id = button.getAttribute('data-id');
+      const title = button.getAttribute('data-title');
+      
+      if (confirm(`Tem certeza que deseja excluir o artigo "${title}"? esta ação não pode ser desfeita.`)) {
+        try {
+          const { error } = await actions.deleteWiki({ id: Number(id) });
+          if (error) {
+            alert('Falha ao excluir: ' + error.message);
+          } else {
+            window.location.reload();
+          }
+        } catch (err) {
+          alert('Erro inesperado ao excluir.');
+        }
+      }
+    });
+  });
+</script>
+
